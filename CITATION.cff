@@ -9,12 +9,12 @@ version: 0.1.0
 date-released: "2026-07-05"
 license: MIT
 repository-code: "https://github.com/NosakhareOsaro/pharminform"
-# Placeholder DOI -- register a Zenodo DOI for the first tagged release
-# (GitHub Settings > Integrations, or manually via zenodo.org) and replace
-# this before/after JOSS submission. Do not leave "10.5281/zenodo.XXXXXXX"
-# in a public release; either fill it in or remove the doi field entirely
-# until it exists.
-doi: "10.5281/zenodo.XXXXXXX"
+# No "doi" field: Zenodo's GitHub integration mints a DOI only after it
+# successfully archives a release, so a doi field can't validly exist
+# beforehand -- a placeholder here (previously "10.5281/zenodo.XXXXXXX")
+# caused Zenodo's CFF loader to fail with "Citation metadata load failed"
+# on the v0.1.0 archive attempt. Add this field back in, pointing at the
+# real minted DOI, only after Zenodo has successfully archived a release.
 keywords:
   - pharmacogenomics
   - CPIC
