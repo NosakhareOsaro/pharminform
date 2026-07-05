@@ -1,5 +1,7 @@
 # PharmInform
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21210588.svg)](https://doi.org/10.5281/zenodo.21210588)
+
 Clinical pharmacogenomics (PGx) platform: star allele calling, CPIC/DPWG
 dosing guidance, and an experimental multi-gene composite risk score for
 drugs affected by more than one pharmacogene -- a gap in existing
