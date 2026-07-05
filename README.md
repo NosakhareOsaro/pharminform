@@ -163,7 +163,7 @@ reproducible findings, not assumptions. See
 for exactly what's needed to complete a real run (install `bcftools`,
 verify per-sample 1000 Genomes panel membership, wire the caller into the
 fetch step, transcribe the remaining five genes' consensus tables from
-Pratt et al. 2016, PMID:26621017).
+Pratt et al. 2016, PMID:26621101).
 
 ## Composite Risk Scoring (Experimental)
 

@@ -6,7 +6,7 @@
       "coriell_catalog": "https://www.coriell.org/1/NIGMS/Additional-Resources/Multiply-Confirmed-Mutations-GeT-RM"
     },
     "other_genes_pending": {
-      "citation": "Pratt VM, et al. Characterization of 137 Genomic DNA Reference Materials for 28 Pharmacogenetic Genes: A GeT-RM Collaborative Project. Genet Med. 2016. PMID:26621017 (covers CYP2C9, CYP2C19, DPYD, TPMT, UGT1A1 among others -- consensus table not yet transcribed here)"
+      "citation": "Pratt VM, et al. Characterization of 137 Genomic DNA Reference Materials for 28 Pharmacogenetic Genes: A GeT-RM Collaborative Project. J Mol Diagn. 2016. PMID:26621101 (covers CYP2C9, CYP2C19, DPYD, TPMT, UGT1A1 among others -- consensus table not yet transcribed here). Corrected 2026-07: previously cited as PMID:26621017 / journal 'Genet Med', both wrong -- 26621017 is an unrelated paper, confirmed via direct PubMed fetch."
     }
   },
   "samples": [

@@ -15,9 +15,13 @@ line DNA samples, established by cross-laboratory concordance testing.
 Two GeT-RM publications are relevant to this project's target genes:
 
 * Pratt VM, et al. *Characterization of 137 Genomic DNA Reference Materials
-  for 28 Pharmacogenetic Genes: A GeT-RM Collaborative Project.* Genet Med.
-  2016. **PMID:26621017** -- covers CYP2C9, CYP2C19, DPYD, TPMT, UGT1A1
-  (among others).
+  for 28 Pharmacogenetic Genes: A GeT-RM Collaborative Project.* J Mol
+  Diagn. 2016. **PMID:26621101** -- covers CYP2C9, CYP2C19, DPYD, TPMT,
+  UGT1A1 (among others). (Corrected 2026-07: a prior version of this
+  document cited PMID:26621017 and journal "Genet Med" for this paper --
+  both wrong. 26621017 is an unrelated ovarian endometriosis paper,
+  confirmed via direct PubMed fetch. The correct PMID and journal are
+  above.)
 * Gaedigk A, et al. *Characterization of Reference Materials for Genetic
   Testing of CYP2D6 Alleles: A GeT-RM Collaborative Project.* J Mol Diagn.
   2019. **PMID:31401124** -- CYP2D6-specific, since CYP2D6's structural
@@ -30,7 +34,7 @@ Two GeT-RM publications are relevant to this project's target genes:
 published CYP2D6 consensus diplotypes transcribed from the Gaedigk 2019
 paper (PMID:31401124), including the well-known NA17244 sample
 (consensus: `*2x2/*4x2+hybrid`). **The other five target genes'
-consensus tables (published in Pratt 2016, PMID:26621017) have not yet
+consensus tables (published in Pratt 2016, PMID:26621101) have not yet
 been transcribed into this repo** -- that's a to-do, not an omission of
 data that doesn't exist.
 
@@ -81,7 +85,7 @@ environment, not data access.
    (or `caller.run_aldy` if a BAM/CRAM is fetched instead of a VCF -- strongly
    preferred for CYP2D6 given its structural variation), and compare the
    result to `consensus_diplotype`.
-4. Transcribe the Pratt 2016 (PMID:26621017) consensus tables for
+4. Transcribe the Pratt 2016 (PMID:26621101) consensus tables for
    CYP2C9, CYP2C19, DPYD, TPMT, and UGT1A1 into
    `getrm_consensus_genotypes.json` to extend coverage beyond CYP2D6.
 5. Re-run `pytest tests/test_getrm_validation.py` and replace this report's
