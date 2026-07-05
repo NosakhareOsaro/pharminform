@@ -1,0 +1,75 @@
+{% set name = "pharminform" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  # Placeholder: Bioconda recipes build from a released sdist/tarball, not
+  # a local path. Replace `url`/`sha256` with the PyPI release tarball once
+  # PharmInform has been published there (`pip install build && python -m
+  # build` locally, then `twine upload dist/*` -- see README.md). This
+  # skeleton is not submittable to bioconda-recipes as-is until that exists.
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: "REPLACE_WITH_REAL_SHA256_OF_RELEASED_SDIST"
+
+build:
+  number: 0
+  noarch: python
+  script: "{{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv"
+  entry_points:
+    - pharminform = pharminform.cli:app
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+    - hatchling
+  run:
+    - python >=3.10
+    - cyvcf2 >=0.30
+    - requests >=2.31
+    - jinja2 >=3.1
+    - weasyprint >=60.0
+    - typer >=0.12
+    - fastapi >=0.110
+    - uvicorn >=0.29
+    - python-multipart >=0.0.9
+    - streamlit >=1.33
+    - networkx >=3.2
+    - pandas >=2.2
+    - pydantic >=2.6
+
+test:
+  imports:
+    - pharminform
+    - pharminform.caller
+    - pharminform.composite_risk
+  commands:
+    - pharminform version
+
+about:
+  home: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: "Clinical pharmacogenomics platform: star allele calling, CPIC/DPWG dosing guidance, and multi-gene composite risk scoring"
+  description: |
+    PharmInform calls star alleles for six pharmacogenes (CYP2D6, CYP2C19,
+    DPYD, UGT1A1, TPMT, CYP2C9), maps diplotypes to CPIC-standard
+    phenotypes, looks up CPIC dosing guidance, and computes an
+    experimental multi-gene composite risk score for drugs affected by
+    more than one pharmacogene.
+  doc_url: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+  dev_url: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+
+extra:
+  recipe-maintainers:
+    - YOUR_GITHUB_USERNAME
+  # Aldy (optional extra, `pip install pharminform[aldy]`) is intentionally
+  # NOT a run dependency here: it requires an ILP solver (Gurobi or Google
+  # OR-Tools/CBC) that isn't a straightforward noarch conda dependency, and
+  # pulling it in unconditionally would make this recipe far heavier than
+  # most of PharmInform's functionality actually needs. Document this
+  # tradeoff rather than silently bundling or silently omitting Aldy.
