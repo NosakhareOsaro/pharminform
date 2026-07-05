@@ -12,7 +12,8 @@ Medical Genetics Summary covering amitriptyline/CYP2D6/CYP2C19
 data" on combined-genotype patients. That absence is itself documented
 here rather than papered over with an invented case; the amitriptyline
 check below instead validates the model against the single-gene
-(CYP2D6 PM) scenario that IS well-documented (FDA label; PMID:28520380),
+(CYP2D6 PM) scenario that IS well-documented -- per the Medical Genetics
+Summary at PMID:28520380, which itself summarizes FDA label content --
 run through the same multi-gene composite pathway.
 """
 
@@ -47,7 +48,8 @@ def test_tpmt_homozygous_pancytopenia_case():
 
 
 def test_amitriptyline_cyp2d6_poor_metabolizer_case():
-    """FDA label / PMID:28520380 -- CYP2D6 poor metabolizers have
+    """PMID:28520380 (Dean L, Kane M -- NCBI Medical Genetics Summary,
+    summarizing FDA label content) -- CYP2D6 poor metabolizers have
     higher-than-expected tricyclic plasma concentrations at usual doses
     and an increased risk of adverse effects; CPIC-summarized guidance
     recommends a 50% starting-dose reduction with therapeutic drug
