@@ -81,7 +81,7 @@ by `composite_risk.py`.
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/pharminform.git
+git clone https://github.com/NosakhareOsaro/pharminform.git
 cd pharminform
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -90,12 +90,12 @@ pip install -e ".[dev]"
 PDF export (`weasyprint`) needs native Pango/cairo/GObject libraries not
 installed by `pip`:
 
-* **macOS (Homebrew):** `brew install pango`, then run with
+- **macOS (Homebrew):** `brew install pango`, then run with
   `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` set (Apple Silicon) --
   confirmed necessary on this project's own development machine; a plain
   `brew install pango` was not sufficient on its own.
-* **Linux (Debian/Ubuntu):** `apt-get install libpango-1.0-0
-  libpangoft2-1.0-0 libgdk-pixbuf-2.0-0 libcairo2` (see `Dockerfile` and
+- **Linux (Debian/Ubuntu):** `apt-get install libpango-1.0-0
+libpangoft2-1.0-0 libgdk-pixbuf-2.0-0 libcairo2` (see `Dockerfile` and
   `.github/workflows/ci.yml` for exact package names, including the
   `libgdk-pixbuf2.0-0` → `libgdk-pixbuf-2.0-0` rename on Debian trixie that
   broke this project's own first Docker build attempt).
@@ -135,14 +135,14 @@ docker run -p 8501:8501 pharminform streamlit run streamlit_app/app.py --server.
 
 ## CPIC gene coverage
 
-| Gene | Star allele source (this project) | Structural variation? |
-|---|---|---|
-| CYP2D6 | Aldy (BAM/CRAM) preferred; simplified rule-based VCF fallback | Yes -- deletions/duplications/hybrids; VCF-only calls are always flagged low-confidence |
-| CYP2C19 | Aldy or rule-based VCF | No |
-| CYP2C9 | Aldy or rule-based VCF | No |
-| DPYD | Aldy or rule-based VCF | No |
-| TPMT | Aldy or rule-based VCF | No |
-| UGT1A1 | Aldy or rule-based VCF | Yes (*28 TA-repeat expansion; not representable as a simple SNV match) |
+| Gene    | Star allele source (this project)                             | Structural variation?                                                                   |
+| ------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| CYP2D6  | Aldy (BAM/CRAM) preferred; simplified rule-based VCF fallback | Yes -- deletions/duplications/hybrids; VCF-only calls are always flagged low-confidence |
+| CYP2C19 | Aldy or rule-based VCF                                        | No                                                                                      |
+| CYP2C9  | Aldy or rule-based VCF                                        | No                                                                                      |
+| DPYD    | Aldy or rule-based VCF                                        | No                                                                                      |
+| TPMT    | Aldy or rule-based VCF                                        | No                                                                                      |
+| UGT1A1  | Aldy or rule-based VCF                                        | Yes (\*28 TA-repeat expansion; not representable as a simple SNV match)                 |
 
 The rule-based VCF matcher (`caller.call_diplotype_from_vcf`) uses a
 small, illustrative, non-exhaustive allele table
@@ -176,7 +176,7 @@ per-gene signals into one risk indicator. `composite_risk.py` does that:
 
 1. Each gene's phenotype is converted to a normalized activity score
    (0 = poor metabolizer/no function, 1 = normal, capped at 1 -- this
-   models *reduced-function toxicity accumulation* only).
+   models _reduced-function toxicity accumulation_ only).
 2. Each contributing gene is weighted by its published fraction of the
    drug's metabolism (`fraction_metabolized` in
    `data/drug_pathway_weights.json`, cited in `DATA_SOURCES.md`) -- or, if
@@ -198,7 +198,7 @@ per-gene signals into one risk indicator. `composite_risk.py` does that:
 **This is exploratory, not a validated clinical scoring system.** Every
 result carries a mandatory disclaimer field. Three drugs in the reference
 dataset (codeine, tramadol, clopidogrel) are prodrug-activation pathways
-where reduced gene function means *under-treatment*, not toxicity
+where reduced gene function means _under-treatment_, not toxicity
 accumulation -- the opposite of what the composite score's default
 framing assumes; this is flagged per-drug (`directionality` field) and
 discussed in full in `DATA_SOURCES.md` and `paper.md`'s limitations

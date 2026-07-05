@@ -50,7 +50,7 @@ test:
     - pharminform version
 
 about:
-  home: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+  home: "https://github.com/NosakhareOsaro/pharminform"
   license: MIT
   license_family: MIT
   license_file: LICENSE
@@ -61,12 +61,12 @@ about:
     phenotypes, looks up CPIC dosing guidance, and computes an
     experimental multi-gene composite risk score for drugs affected by
     more than one pharmacogene.
-  doc_url: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
-  dev_url: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+  doc_url: "https://github.com/NosakhareOsaro/pharminform"
+  dev_url: "https://github.com/NosakhareOsaro/pharminform"
 
 extra:
   recipe-maintainers:
-    - YOUR_GITHUB_USERNAME
+    - NosakhareOsaro
   # Aldy (optional extra, `pip install pharminform[aldy]`) is intentionally
   # NOT a run dependency here: it requires an ILP solver (Gurobi or Google
   # OR-Tools/CBC) that isn't a straightforward noarch conda dependency, and

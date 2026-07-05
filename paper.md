@@ -1,5 +1,5 @@
 ---
-title: 'PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring'
+title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
 tags:
   - Python
   - pharmacogenomics
@@ -7,11 +7,11 @@ tags:
   - clinical genomics
   - CPIC
 authors:
-  - name: Your Name
-    orcid: 0000-0000-0000-0000
+  - name: Nosakhare Osaro
+    orcid: 0009-0004-9778-1161
     affiliation: 1
 affiliations:
-  - name: Your Institution
+  - name: Independent Researcher
     index: 1
 date: 05 July 2026
 bibliography: paper.bib
@@ -23,8 +23,8 @@ PharmInform is a Python platform for clinical pharmacogenomics (PGx) that
 takes a patient VCF (or, for copy-number-aware calling, aligned reads) and
 produces star allele calls, CPIC-standard metabolizer phenotypes, and
 CPIC dosing recommendations for six pharmacogenes commonly implicated in
-adverse drug reactions and treatment failure: *CYP2D6*, *CYP2C19*,
-*DPYD*, *UGT1A1*, *TPMT*, and *CYP2C9*. It is delivered as an installable
+adverse drug reactions and treatment failure: _CYP2D6_, _CYP2C19_,
+_DPYD_, _UGT1A1_, _TPMT_, and _CYP2C9_. It is delivered as an installable
 Python package, a command-line tool, a FastAPI REST endpoint, and a
 Streamlit web demo, all sharing one pipeline
 (`pharminform.pipeline.run_pipeline`). Beyond reproducing standard
@@ -38,7 +38,7 @@ tools do not address (see Statement of Need).
 Star allele calling from sequencing data is a solved-enough problem to
 have several mature open-source tools: Aldy performs copy-number-aware
 allelic decomposition from aligned reads and explicitly models structural
-variation such as *CYP2D6* deletions, duplications, and gene-conversion
+variation such as _CYP2D6_ deletions, duplications, and gene-conversion
 hybrids [@numanagic2018aldy]; PharmCAT annotates VCF-derived diplotypes
 against CPIC guidelines and generates a prescribing report
 [@sangkuhl2020pharmcat]; StellarPGx uses genome-graph-based variant
@@ -52,8 +52,8 @@ not aligned reads, is available) cannot detect structural variation and
 is always reported at reduced confidence.
 
 What none of Aldy, PharmCAT, or StellarPGx do is combine per-gene
-phenotypes into a single risk signal for drugs metabolized by *more than
-one* pharmacogene. Amitriptyline is a representative case: CYP2D6
+phenotypes into a single risk signal for drugs metabolized by _more than
+one_ pharmacogene. Amitriptyline is a representative case: CYP2D6
 hydroxylates it to a less-active metabolite while CYP2C19 demethylates it
 to the active metabolite nortriptyline, so a patient's combined
 CYP2D6/CYP2C19 status -- not either gene alone -- determines their actual
@@ -126,7 +126,7 @@ along with the exact steps needed to complete a real run.
 # Availability
 
 PharmInform is available under the MIT license at
-`https://github.com/YOUR_GITHUB_USERNAME/pharminform`, with a test suite
+`https://github.com/NosakhareOsaro/pharminform`, with a test suite
 of over 100 tests, continuous integration, a Dockerfile, and a Bioconda
 recipe skeleton (not yet submitted -- see README).
 
