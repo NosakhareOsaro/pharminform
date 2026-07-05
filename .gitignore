@@ -28,3 +28,5 @@ docs/_build/
 *.cram
 *.fastq.gz
 /validation/data/
+
+.claude/
