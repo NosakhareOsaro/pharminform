@@ -9,11 +9,11 @@ affected by more than one pharmacogene.
 ## Progress checklist
 
 - [x] Repo scaffold, packaging, license
-- [ ] VCF ingestion + Aldy star allele calling wrapper
-- [ ] PharmVar + PharmGKB API clients
-- [ ] CPIC/DPWG guideline lookup + cache
-- [ ] OMOP CDM drug_exposure mapping
-- [ ] Diplotype call confidence flagging
+- [x] VCF ingestion + Aldy star allele calling wrapper
+- [x] PharmVar + PharmGKB API clients
+- [x] CPIC/DPWG guideline lookup + cache
+- [x] OMOP CDM drug_exposure mapping
+- [x] Diplotype call confidence flagging
 - [ ] Curated drug-pathway weight reference data
 - [ ] Composite multi-gene risk scoring engine
 - [ ] Directional ultrarapid-metabolizer flag
