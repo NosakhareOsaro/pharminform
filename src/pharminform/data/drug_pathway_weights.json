@@ -1,0 +1,105 @@
+{
+  "_readme": "Every fraction_metabolized value and source below was verified by web search/fetch against a real PubMed record, FDA label, or the live CPIC API (api.cpicpgx.org) -- see DATA_SOURCES.md for the full citation table and per-value notes. Where no published quantitative fraction could be found, fraction_metabolized is null and weighting_method falls back to equal weighting across the drug's contributing genes (see composite_risk.py). directionality flags drugs where reduced enzyme function does NOT increase toxicity risk (prodrug activation), which composite_risk_score's 'lower composite = higher risk' framing does not correctly model -- these are called out in DATA_SOURCES.md and paper.md as an explicit scope limitation.",
+  "drugs": [
+    {
+      "drug": "amitriptyline",
+      "rxnorm_id": "704",
+      "contributing_genes": [
+        {"gene": "CYP2D6", "fraction_metabolized": null, "source": "PMID:23486447; PMID:27997040 (CPIC TCA guideline, qualitative: CYP2D6 forms the less-active 10-hydroxy metabolite)"},
+        {"gene": "CYP2C19", "fraction_metabolized": null, "source": "PMID:23486447; PMID:27997040 (CPIC TCA guideline, qualitative: CYP2C19 demethylates amitriptyline to the active metabolite nortriptyline)"}
+      ],
+      "directionality": "clearance",
+      "notes": "Both pathways contribute to active/inactive metabolite balance; CPIC's guideline text is qualitative about the relative contribution and does not publish a single quantitative split, so both fractions are null (equal-weight fallback applies)."
+    },
+    {
+      "drug": "codeine",
+      "rxnorm_id": "2670",
+      "contributing_genes": [
+        {"gene": "CYP2D6", "fraction_metabolized": 0.10, "source": "PMID:22205192 (Crews et al., CPIC codeine/CYP2D6 guideline: ~10% of codeine is O-demethylated by CYP2D6 to morphine)"}
+      ],
+      "directionality": "prodrug_activation",
+      "notes": "CYP2D6 activates codeine to morphine, its active analgesic form; this is a minority (~10%) pathway by mass but is the entire source of opioid activity. Reduced CYP2D6 function REDUCES active metabolite formation (under-treated pain), it does not cause parent-drug toxicity accumulation -- the composite model's default risk direction does not apply here. Ultrarapid metabolizer risk (morphine over-formation/toxicity) is handled separately by directional_flag()."
+    },
+    {
+      "drug": "tramadol",
+      "rxnorm_id": "10689",
+      "contributing_genes": [
+        {"gene": "CYP2D6", "fraction_metabolized": null, "source": "PMID:33387367 (CPIC CYP2D6/opioids guideline, qualitative: CYP2D6 is the primary route to the active O-desmethyltramadol/M1 metabolite; no single quantitative fraction is consistently published)"}
+      ],
+      "directionality": "prodrug_activation",
+      "notes": "Same prodrug-activation caveat as codeine: M1 is a more potent mu-opioid agonist than tramadol itself; reduced CYP2D6 function reduces analgesic effect rather than causing toxic accumulation."
+    },
+    {
+      "drug": "clopidogrel",
+      "rxnorm_id": "32968",
+      "contributing_genes": [
+        {"gene": "CYP2C19", "fraction_metabolized": null, "source": "PMID:35034351 (CPIC clopidogrel guideline, 2022 update); qualitative in vitro data (non-PMID-verified secondary source) reports CYP2C19 as the largest single CYP contributor at both oxidative activation steps (~45% and ~21%)"}
+      ],
+      "directionality": "prodrug_activation",
+      "notes": "~85% of clopidogrel is hydrolyzed to an inactive form by carboxylesterase-1 (CES1), an enzyme outside this project's gene panel; of the ~15% that undergoes 2-step CYP oxidation to the active antiplatelet metabolite, CYP2C19 is the dominant contributor at both steps. Reduced CYP2C19 function reduces antiplatelet effect (thrombotic risk), which is the OPPOSITE of the composite model's toxicity-accumulation framing -- flagged here rather than silently mis-scored."
+    },
+    {
+      "drug": "warfarin",
+      "rxnorm_id": "11289",
+      "contributing_genes": [
+        {"gene": "CYP2C9", "fraction_metabolized": 0.80, "source": "PMID:27539372 (CYP2C9 genotype-dependent warfarin pharmacokinetics); PMID:21900891, PMID:28198005 (CPIC warfarin/CYP2C9/VKORC1 guideline): ~80-85% of the more potent S-warfarin enantiomer is cleared via CYP2C9-mediated 6-/7-hydroxylation"}
+      ],
+      "directionality": "clearance",
+      "notes": "VKORC1 is warfarin's pharmacodynamic target (vitamin K epoxide reductase), not a metabolizing enzyme, and CYP4F2 is a minor modifier -- both are part of CPIC's warfarin guideline but outside this project's 6-gene metabolizing-enzyme panel, so warfarin is represented here as CYP2C9-only. CPIC's own recommendation table has zero phenotype-lookup rows for warfarin (see cpic_dpwg.py) because CPIC recommends a validated multi-variable dosing algorithm rather than a discrete phenotype-to-dose table; this composite entry is therefore illustrative of the CYP2C9 clearance pathway only, not a substitute for that algorithm."
+    },
+    {
+      "drug": "voriconazole",
+      "rxnorm_id": "121243",
+      "contributing_genes": [
+        {"gene": "CYP2C19", "fraction_metabolized": 0.631, "source": "PMID:35335853 (in vitro CYP-inhibition study: CYP2C19 contributes 63.1% to hepatic N-oxidation of voriconazole, vs 13.4% CYP2C9 and 29.5% CYP3A4); PMID:27981572 (CPIC CYP2C19/voriconazole guideline)"}
+      ],
+      "directionality": "clearance",
+      "notes": "CYP2C19 is the dominant clearance pathway; poor metabolizers accumulate voriconazole and are at increased risk of hepatotoxicity and QT prolongation, consistent with the composite model's toxicity-accumulation framing."
+    },
+    {
+      "drug": "fluorouracil",
+      "rxnorm_id": "4492",
+      "contributing_genes": [
+        {"gene": "DPYD", "fraction_metabolized": 0.80, "source": "PMID:12164772 (Johnson & Diasio, implications of DPD on 5-FU pharmacogenetics: DPD catabolizes >80% of administered 5-FU); PMID:23988873 (CPIC DPYD/fluoropyrimidines guideline)"}
+      ],
+      "directionality": "clearance",
+      "notes": "DPYD-encoded DPD is the rate-limiting catabolic enzyme for 5-FU; reduced/absent activity causes severe, sometimes fatal toxicity from parent-drug accumulation -- the canonical example of this composite model's intended use case."
+    },
+    {
+      "drug": "capecitabine",
+      "rxnorm_id": "194000",
+      "contributing_genes": [
+        {"gene": "DPYD", "fraction_metabolized": 0.80, "source": "PMID:12164772; PMID:23988873 (CPIC DPYD/fluoropyrimidines guideline) -- capecitabine is an oral prodrug converted to 5-FU, which is then subject to the same DPD-mediated catabolism"}
+      ],
+      "directionality": "clearance",
+      "notes": "Capecitabine's clinically relevant DPYD sensitivity is via its active metabolite 5-FU, not capecitabine itself; the fraction_metabolized value is carried over from the 5-FU literature rather than a capecitabine-specific measurement, which is a simplification worth noting."
+    },
+    {
+      "drug": "irinotecan",
+      "rxnorm_id": "343047",
+      "contributing_genes": [
+        {"gene": "UGT1A1", "fraction_metabolized": null, "source": "PMID:26417955 (CPIC UGT1A1/irinotecan guideline); PMID:9789606 (Iyer et al., UGT1A1 genotype and SN-38 glucuronidation) -- both qualitative on UGT1A1 as the primary deactivating enzyme for the active metabolite SN-38; no single consistently-cited quantitative fraction of total SN-38 clearance was found"}
+      ],
+      "directionality": "clearance",
+      "notes": "UGT1A1 glucuronidates the active, cytotoxic metabolite SN-38 to inactive SN-38G; reduced UGT1A1 function (e.g. *28/*28, Gilbert syndrome genotype) causes SN-38 accumulation and severe neutropenia/diarrhea risk, consistent with the toxicity-accumulation framing. fraction_metabolized is null pending a verifiable quantitative source; equal-weight fallback applies (moot here since UGT1A1 is irinotecan's only gene in this panel)."
+    },
+    {
+      "drug": "azathioprine",
+      "rxnorm_id": "1256",
+      "contributing_genes": [
+        {"gene": "TPMT", "fraction_metabolized": null, "source": "PMID:21270794, PMID:23422873, PMID:30447069 (CPIC TPMT/NUDT15/thiopurines guideline and updates) -- qualitative: TPMT is one of three competing inactivation/activation pathways (with xanthine oxidase and HPRT); no single published fraction isolates TPMT's share of total thiopurine clearance"}
+      ],
+      "directionality": "clearance",
+      "notes": "CPIC's guideline for azathioprine/mercaptopurine is co-authored around TPMT AND NUDT15; NUDT15 is outside this project's 6-gene panel and is not modeled here -- a deliberate scope limitation, not an oversight. Reduced TPMT activity shunts thiopurine metabolism toward the HPRT pathway, increasing cytotoxic 6-thioguanine nucleotides and myelosuppression risk, consistent with the toxicity-accumulation framing."
+    },
+    {
+      "drug": "mercaptopurine",
+      "rxnorm_id": "103",
+      "contributing_genes": [
+        {"gene": "TPMT", "fraction_metabolized": null, "source": "PMID:21270794, PMID:23422873, PMID:30447069 (CPIC TPMT/NUDT15/thiopurines guideline and updates); same qualitative basis as azathioprine, its prodrug"}
+      ],
+      "directionality": "clearance",
+      "notes": "Same NUDT15 scope limitation as azathioprine (see above); mercaptopurine is azathioprine's active downstream metabolite so the TPMT pharmacology is directly shared."
+    }
+  ]
+}
