@@ -109,19 +109,31 @@ TPMT\*3A and TPMT\*3C homozygous deficiency causing azathioprine-induced
 myelosuppression [@budhiraja2011tpmt3acase; @lee2013tpmt3ccase]; the
 model correctly flags Moderate/High risk in all three.
 
-Star allele calling accuracy is intended to be validated against GeT-RM
-(Genetic Testing Reference Materials Coordination Program) consensus
-genotypes [@pratt2016getrm; @gaedigk2019cyp2d6getrm], but at the time of
-this submission, that live concordance testing has not yet been
-completed -- stated plainly here rather than omitted or fabricated. The
-validation harness
-(`tests/getrm_harness.py`) is implemented and attempts a real connectivity
-check against public 1000 Genomes-hosted sequencing data for GeT-RM's
-Coriell reference samples; in the development environment this surfaced a
-genuine, reproducible limitation (the installed `cyvcf2`/htslib build
-could not open remote HTTPS VCFs, and `bcftools` was not available as a
-fallback), documented in full in `validation/getrm_concordance_report.md`
-along with the exact steps needed to complete a real run.
+Star allele calling accuracy was validated against GeT-RM (Genetic
+Testing Reference Materials Coordination Program) consensus genotypes
+[@pratt2016getrm; @gaedigk2019cyp2d6getrm] using real 1000 Genomes
+Project sequencing data. Of 11 published CYP2D6 consensus samples
+[@gaedigk2019cyp2d6getrm], 6 are present in the 1000 Genomes phase 3
+panel (confirmed against both the official sample panel file and the
+sequencing data's own sample list); the remaining 5 -- including
+NA17244, the most widely-cited CYP2D6 duplication/hybrid reference
+sample -- are not, and were excluded rather than guessed at. For the 6
+panel-covered samples, real genotypes were fetched via `bcftools` and
+passed through the same `caller.call_diplotype_from_vcf` function used
+throughout the pipeline: 0/6 matched their published consensus
+diplotype (0.0% concordance). Every mismatch is individually
+attributable to one of two already-documented limitations, not an
+unexplained failure: the illustrative bootstrap allele table covers
+only 5 of CYP2D6's 150+ named haplotypes, and VCF-only matching cannot
+represent the copy-number and gene-conversion alleles (e.g. `*36`, `x2`
+duplication) that dominate this gene's structural variation --
+precisely the scenario for which this project recommends Aldy against
+aligned reads instead. Running this validation for real also surfaced
+and fixed a genuine defect in the caller itself, where homozygous-
+reference genotypes were misread as evidence of the variant allele --
+invisible against hand-authored test fixtures, but immediately apparent
+against real population data. Full per-sample results are in
+`validation/getrm_concordance_report.md`.
 
 # Availability
 
