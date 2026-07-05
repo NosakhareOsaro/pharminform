@@ -162,6 +162,8 @@ def load_variants(
             if depth is not None and depth < min_depth:
                 continue
             gt_str = _genotype_string(rec)  # per-sample; assume single-sample VCF
+            if not _has_alt_allele(gt_str):
+                continue
             for alt in rec.ALT:
                 results[gene].append(
                     VariantCall(
@@ -222,6 +224,24 @@ def _genotype_string(rec) -> str:
         return alleles.replace("/", phased) if phased == "|" else alleles
     except Exception:
         return "./."
+
+
+def _has_alt_allele(genotype: str) -> bool:
+    """True if a genotype string carries at least one non-reference,
+    non-missing allele (e.g. "0/1", "1/1" -> True; "0/0", "./." -> False).
+
+    A gene region VCF slice lists every polymorphic site seen across an
+    entire population, not just sites where this one sample carries the
+    alternate allele -- without this check, a homozygous-reference (0/0)
+    call at a defining position would be misread as evidence the sample
+    carries that star allele. Caught by running the real GeT-RM
+    validation harness against actual 1000 Genomes population data,
+    where it silently produced the same wrong diplotype for every
+    sample; invisible against the hand-authored synthetic test fixture,
+    which only ever included rows where the variant was truly present.
+    """
+    alleles = genotype.replace("|", "/").split("/")
+    return any(a not in ("0", ".") for a in alleles)
 
 
 def aldy_available() -> bool:
@@ -312,7 +332,7 @@ def call_diplotype_from_vcf(
     by_rsid = {info["rsid"]: name for name, info in defs.items()}
 
     for v in variants:
-        if v.rsid in by_rsid:
+        if v.rsid in by_rsid and _has_alt_allele(v.genotype):
             allele_name = by_rsid[v.rsid]
             zygosity = "hom" if v.genotype in ("1/1", "1|1") else "het"
             observed.append((allele_name, zygosity))

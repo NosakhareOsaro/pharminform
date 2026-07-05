@@ -39,6 +39,13 @@ VARIANTS = [
     ("chr6", 18143955, "rs1142345", "A", "G", "1/1", 30),
     # A low-depth CYP2D6*4 call -> should be filtered out by min_depth
     ("chr22", 42126611, "rs3892097", "G", "A", "0/1", 4),
+    # CYP2C9*2 defining position, but homozygous REFERENCE (0/0) -- this
+    # sample does NOT carry the variant allele. A gene-region VCF slice
+    # lists every polymorphic site in the population, so most samples are
+    # 0/0 at most positions; this row exists to prove load_variants
+    # excludes it rather than misreading it as evidence of *2 (see the
+    # real-world bug this caught, described in caller._has_alt_allele).
+    ("chr10", 94938683, "rs1799853", "C", "T", "0/0", 40),
 ]
 
 

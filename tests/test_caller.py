@@ -41,6 +41,27 @@ def test_call_diplotype_from_vcf_defaults_to_wildtype():
     assert call.ambiguous_candidates == []
 
 
+def test_load_variants_excludes_homozygous_reference_calls():
+    # Real bug this guards against: a gene-region VCF slice lists every
+    # polymorphic site in the population, so a homozygous-reference (0/0)
+    # call at a defining position must NOT be treated as "this sample
+    # carries the variant" -- caught by the real GeT-RM validation run,
+    # invisible against a hand-authored fixture that never included a 0/0
+    # row before.
+    variants = caller.load_variants(FIXTURE_VCF, min_depth=10)
+    cyp2c9 = variants["CYP2C9"]
+    assert all(v.rsid != "rs1799853" for v in cyp2c9)
+
+
+def test_call_diplotype_from_vcf_ignores_homozygous_reference_variant():
+    hom_ref = caller.VariantCall(
+        gene="CYP2C9", chrom="chr10", pos=1, ref="C", alt="T",
+        genotype="0/0", depth=40, qual=99.0, filter="PASS", rsid="rs1799853",
+    )
+    call = caller.call_diplotype_from_vcf("CYP2C9", [hom_ref])
+    assert call.diplotype == "*1/*1"
+
+
 def test_vcf_not_found_raises():
     with pytest.raises(caller.VCFIngestError):
         caller.load_variants("does_not_exist.vcf")
