@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pharminform"
+version = "0.1.0"
+description = "Clinical pharmacogenomics platform: star allele calling, CPIC/DPWG dosing guidance, and multi-gene composite risk scoring"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Your Name", email = "you@example.com" }
+]
+keywords = ["pharmacogenomics", "PGx", "CPIC", "DPWG", "clinical-genomics", "bioinformatics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    "cyvcf2>=0.30",
+    "requests>=2.31",
+    "jinja2>=3.1",
+    "weasyprint>=60.0",
+    "typer>=0.12",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "python-multipart>=0.0.9",
+    "streamlit>=1.33",
+    "networkx>=3.2",
+    "pandas>=2.2",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+aldy = ["aldy>=4.0"]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.14",
+    "responses>=0.25",
+    "ruff>=0.4",
+    "build>=1.2",
+]
+
+[project.scripts]
+pharminform = "pharminform.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+Issues = "https://github.com/YOUR_GITHUB_USERNAME/pharminform/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pharminform"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]

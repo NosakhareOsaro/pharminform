@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+docs/_build/
+
+*.log
+.DS_Store
+
+# generated reports (examples only, not source)
+/reports/*.html
+/reports/*.pdf
+
+# large reference/sequencing data — not committed
+*.bam
+*.bai
+*.cram
+*.fastq.gz
+/validation/data/
