@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use PharmInform, please cite it using the metadata below."
+title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
+authors:
+  - family-names: "Your Last Name"
+    given-names: "Your First Name"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+version: 0.1.0
+date-released: "2026-07-05"
+license: MIT
+repository-code: "https://github.com/YOUR_GITHUB_USERNAME/pharminform"
+# Placeholder DOI -- register a Zenodo DOI for the first tagged release
+# (GitHub Settings > Integrations, or manually via zenodo.org) and replace
+# this before/after JOSS submission. Do not leave "10.5281/zenodo.XXXXXXX"
+# in a public release; either fill it in or remove the doi field entirely
+# until it exists.
+doi: "10.5281/zenodo.XXXXXXX"
+keywords:
+  - pharmacogenomics
+  - CPIC
+  - bioinformatics
+  - clinical genomics
+preferred-citation:
+  type: article
+  title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
+  authors:
+    - family-names: "Your Last Name"
+      given-names: "Your First Name"
+      orcid: "https://orcid.org/0000-0000-0000-0000"
+  journal: "Journal of Open Source Software"
+  # Fill in once accepted -- JOSS assigns its own DOI/volume/issue/page at
+  # publication.
+  year: 2026
