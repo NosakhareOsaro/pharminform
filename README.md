@@ -24,7 +24,7 @@ below).
 - [x] Directional ultrarapid-metabolizer flag
 - [x] Composite risk test suite (monotonicity, fallback)
 - [x] Face-validity case-report tests
-- [x] GeT-RM validation harness (live concordance run pending -- see below)
+- [x] GeT-RM validation: live CYP2D6 concordance run completed (0/6, 0.0% -- see below; other 5 genes' consensus data not yet transcribed)
 - [x] Jinja2 HTML clinical report + PDF export
 - [x] CPIC truth-set pytest suite
 - [x] CLI
@@ -154,18 +154,27 @@ account-issued API key) or for running Aldy directly against aligned reads.
 
 ## GeT-RM validation
 
-A real validation harness against published GeT-RM consensus genotypes
-exists (`tests/getrm_harness.py`, `tests/test_getrm_validation.py`), with
-11 real CYP2D6 consensus diplotypes transcribed from Gaedigk et al. 2019
-(PMID:31401124). **Live concordance has not yet been run**: this
-environment's `cyvcf2` build can't open remote 1000-Genomes-hosted VCFs
-directly, and `bcftools` isn't installed here either -- both confirmed,
-reproducible findings, not assumptions. See
-[`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md)
-for exactly what's needed to complete a real run (install `bcftools`,
-verify per-sample 1000 Genomes panel membership, wire the caller into the
-fetch step, transcribe the remaining five genes' consensus tables from
-Pratt et al. 2016, PMID:26621101).
+A live concordance run against published GeT-RM consensus genotypes has
+been completed for CYP2D6, using real 1000 Genomes sequencing data (11
+consensus diplotypes transcribed from Gaedigk et al. 2019, PMID:31401124).
+Of those 11 samples, 6 are present in the 1000 Genomes phase 3 panel
+(verified against both the official IGSR panel file and the actual VCF
+header) and were run through the real pipeline
+(`bcftools` fetch -> `cyvcf2` parse -> `caller.call_diplotype_from_vcf`);
+the other 5 were honestly skipped as not present in that panel.
+
+**Result: 0/6 matched (0.0% concordance).** This is an expected,
+attributable result, not a bug: every mismatch traces either to an
+allele absent from the small illustrative `BOOTSTRAP_ALLELE_DEFINITIONS`
+table (5 of CYP2D6's 150+ named haplotypes) or to copy-number/gene-conversion
+alleles (`*36`, `x2` duplication, `+hybrid`) that VCF-only matching
+cannot represent -- exactly the limitation this project has documented
+throughout as requiring Aldy against aligned reads instead. Running this
+for real also surfaced and fixed a genuine bug in `caller.py` (homozygous-
+reference genotypes were being misread as evidence of the variant allele).
+Full per-sample breakdown, panel-coverage table, and next steps (the
+other five genes' consensus data, and a same-style Aldy/BAM comparison)
+in [`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
 
 ## Composite Risk Scoring (Experimental)
 
