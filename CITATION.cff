@@ -4,7 +4,14 @@ title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guid
 authors:
   - family-names: "Your Last Name"
     given-names: "Your First Name"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
+    # No placeholder orcid here: Zenodo's CFF loader (zenodo-rdm's
+    # AuthorSchema.validate_orcid) runs idutils.is_orcid() on this field,
+    # which checksums it (ISO 7064 MOD 11-2) -- "0000-0000-0000-0000"
+    # fails that checksum and was the confirmed cause of the
+    # "Citation metadata load failed" error on the v0.1.0 archive attempt
+    # (traced directly in zenodo-rdm's source, not inferred). orcid is
+    # optional in this schema, so omitting it entirely is valid; add a
+    # real ORCID back in once one exists.
 version: 0.1.0
 date-released: "2026-07-05"
 license: MIT
