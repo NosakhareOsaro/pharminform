@@ -1,0 +1,25 @@
+{
+  "_readme": "Real consensus genotypes transcribed from published GeT-RM (Genetic Testing Reference Materials Coordination Program) collaborative studies -- not fabricated. Verify against the primary source table before relying on these for anything beyond a smoke test, since transcription from PDF/HTML sources carries some risk of error. Only CYP2D6 entries are populated (from the most recent, CN-aware GeT-RM CYP2D6 study); the other five target genes have published GeT-RM consensus tables too (Pratt et al. 2016) but were not transcribed into this file -- see validation/getrm_concordance_report.md for what's needed to fill them in.",
+  "source": {
+    "CYP2D6": {
+      "citation": "Gaedigk A, et al. Characterization of Reference Materials for Genetic Testing of CYP2D6 Alleles: A GeT-RM Collaborative Project. J Mol Diagn. 2019. PMID:31401124",
+      "coriell_catalog": "https://www.coriell.org/1/NIGMS/Additional-Resources/Multiply-Confirmed-Mutations-GeT-RM"
+    },
+    "other_genes_pending": {
+      "citation": "Pratt VM, et al. Characterization of 137 Genomic DNA Reference Materials for 28 Pharmacogenetic Genes: A GeT-RM Collaborative Project. Genet Med. 2016. PMID:26621017 (covers CYP2C9, CYP2C19, DPYD, TPMT, UGT1A1 among others -- consensus table not yet transcribed here)"
+    }
+  },
+  "samples": [
+    {"coriell_id": "NA17222", "gene": "CYP2D6", "consensus_diplotype": "*2/*108"},
+    {"coriell_id": "NA17287", "gene": "CYP2D6", "consensus_diplotype": "*1/*83"},
+    {"coriell_id": "NA18524", "gene": "CYP2D6", "consensus_diplotype": "*1/*36x2+*10"},
+    {"coriell_id": "NA18563", "gene": "CYP2D6", "consensus_diplotype": "*1/*36+*10"},
+    {"coriell_id": "NA18564", "gene": "CYP2D6", "consensus_diplotype": "*2A/*36+*10"},
+    {"coriell_id": "NA18565", "gene": "CYP2D6", "consensus_diplotype": "*10/*36x2"},
+    {"coriell_id": "NA19785", "gene": "CYP2D6", "consensus_diplotype": "*1/*13+*2"},
+    {"coriell_id": "NA19790", "gene": "CYP2D6", "consensus_diplotype": "*1/*13+*2"},
+    {"coriell_id": "NA19908", "gene": "CYP2D6", "consensus_diplotype": "*1/*46"},
+    {"coriell_id": "NA20289", "gene": "CYP2D6", "consensus_diplotype": "*6/*11"},
+    {"coriell_id": "NA17244", "gene": "CYP2D6", "consensus_diplotype": "*2x2/*4x2+hybrid"}
+  ]
+}
