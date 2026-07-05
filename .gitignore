@@ -27,6 +27,7 @@ docs/_build/
 *.bai
 *.cram
 *.fastq.gz
+*.vcf.gz.tbi
 /validation/data/
 
 .claude/
