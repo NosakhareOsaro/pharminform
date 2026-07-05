@@ -55,6 +55,26 @@ class ReportContext:
     generated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     version: str = __version__
 
+    def to_dict(self) -> dict:
+        return {
+            "patient_id": self.patient_id,
+            "generated_at": self.generated_at,
+            "version": self.version,
+            "gene_results": [
+                {
+                    "gene": g.gene,
+                    "diplotype": g.diplotype,
+                    "phenotype": g.phenotype,
+                    "calling_method": g.calling_method,
+                    "confidence_level": g.confidence_level,
+                    "confidence_reasons": g.confidence_reasons,
+                }
+                for g in self.gene_results
+            ],
+            "cpic_recommendations": self.cpic_recommendations,
+            "composite_risk": self.composite_results,
+        }
+
 
 def _env() -> Environment:
     return Environment(
