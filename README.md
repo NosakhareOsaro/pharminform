@@ -226,7 +226,8 @@ endpoint, Streamlit app (via `AppTest`), and the NetworkX graph.
 
 ## Disclaimer
 
-PharmInform is a research project, not a certified clinical
+PharmInform is a research
+project, not a certified clinical
 decision support tool. Star allele calls, phenotypes, CPIC
 recommendations, and especially the composite risk score should not be
 used to make real prescribing decisions. Verify all outputs against

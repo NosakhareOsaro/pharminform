@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use PharmInform, please cite it using the metadata below."
 title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
 authors:
-  - family-names: "Your Last Name"
-    given-names: "Your First Name"
+  - family-names: "Osaro"
+    given-names: "Nosakhare"
     # No placeholder orcid here: Zenodo's CFF loader (zenodo-rdm's
     # AuthorSchema.validate_orcid) runs idutils.is_orcid() on this field,
     # which checksums it (ISO 7064 MOD 11-2) -- "0000-0000-0000-0000"
