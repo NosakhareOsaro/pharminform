@@ -161,8 +161,7 @@ def load_variants(
             depth = _extract_depth(rec)
             if depth is not None and depth < min_depth:
                 continue
-            genotypes = rec.gt_types  # per-sample; assume single-sample VCF
-            gt_str = _genotype_string(rec)
+            gt_str = _genotype_string(rec)  # per-sample; assume single-sample VCF
             for alt in rec.ALT:
                 results[gene].append(
                     VariantCall(
@@ -282,7 +281,7 @@ def run_aldy(
 def _parse_aldy_output(out_file: Path) -> tuple[str, list[str]]:
     if not out_file.exists():
         return "unknown", []
-    lines = [l.strip() for l in out_file.read_text().splitlines() if l.strip() and not l.startswith("#")]
+    lines = [line.strip() for line in out_file.read_text().splitlines() if line.strip() and not line.startswith("#")]
     if not lines:
         return "unknown", []
     # Aldy's .aldy output lists one solution per line; first column is the

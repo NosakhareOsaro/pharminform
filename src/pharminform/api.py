@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 import tempfile
-from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse

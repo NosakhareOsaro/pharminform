@@ -1,6 +1,4 @@
-import os
 
-import pytest
 
 from pharminform.report import (
     GeneReportRow,

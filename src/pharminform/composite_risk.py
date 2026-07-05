@@ -24,7 +24,7 @@ flagged per-drug via the "directionality" field in drug_pathway_weights.json.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 DATA_PATH = Path(__file__).parent / "data" / "drug_pathway_weights.json"
