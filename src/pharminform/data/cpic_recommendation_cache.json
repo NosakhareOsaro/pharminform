@@ -1,0 +1,1529 @@
+{
+  "_source": "https://api.cpicpgx.org (CPIC public REST API)",
+  "_fetched": "2026-07-05",
+  "drugs": {
+    "codeine": {
+      "drugid": "RxNorm:2670",
+      "genes": [
+        "CYP2D6"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2D6",
+          "cpiclevel": "A",
+          "citations": [
+            "22205192",
+            "24458010",
+            "33387367"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "\u22653.75"
+          },
+          "drugrecommendation": "Avoid codeine use because of potential for serious toxicity. If opioid use is warranted, consider a non-tramadol opioid.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25"
+          },
+          "drugrecommendation": "Use codeine label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider a non-tramadol opioid.",
+          "classification": "Moderate",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25"
+          },
+          "drugrecommendation": "Use codeine label recommended age- or weight-specific dosing.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0"
+          },
+          "drugrecommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
+          "classification": "Strong",
+          "comments": "n/a"
+        }
+      ]
+    },
+    "tramadol": {
+      "drugid": "RxNorm:10689",
+      "genes": [
+        "CYP2D6"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2D6",
+          "cpiclevel": "A",
+          "citations": [
+            "33387367"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.75"
+          },
+          "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider non-codeine opioid.",
+          "classification": "Optional",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25"
+          },
+          "drugrecommendation": "Use tramadol label recommended age- or weight-specific dosing.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0"
+          },
+          "drugrecommendation": "Avoid tramadol use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-codeine opioid.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5"
+          },
+          "drugrecommendation": "Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        }
+      ]
+    },
+    "clopidogrel": {
+      "drugid": "RxNorm:32968",
+      "genes": [
+        "CYP2C19"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2C19",
+          "cpiclevel": "A",
+          "citations": [
+            "21716271",
+            "23698643",
+            "35034351"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {},
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Avoid standard dose (75 mg) clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Avoid standard dose clopidogrel (75 mg) if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication. The strength of recommendation for \"likely\" phenotypes are the same as their respective confirmed phenotypes. \"Likely\" indicates the uncertainty in the phenotype assignment, but it is reasonable to apply the recommendation for the confirmed phenotype to the corresponding \"likely\" phenotype."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication. The strength of recommendation for \"likely\" phenotypes are the same as their respective confirmed phenotypes. \"Likely\" indicates the uncertainty in the phenotype assignment, but it is reasonable to apply the recommendation for the confirmed phenotype to the corresponding \"likely\" phenotype."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication."
+        },
+        {
+          "population": "CVI ACS PCI ",
+          "phenotypes": {
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+          "classification": "Strong",
+          "comments": "For cardiovascular indications of acute coronary syndrome (ACS) and/or percutaneous coronary intervention (PCI). ACS and/or PCI includes patients undergoing PCI for an ACS or non-ACS (elective) indication."
+        }
+      ]
+    },
+    "voriconazole": {
+      "drugid": "RxNorm:121243",
+      "genes": [
+        "CYP2C19"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2C19",
+          "cpiclevel": "A",
+          "citations": [
+            "27981572"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {},
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with recommended standard of care dosing",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with recommended standard of care dosing",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include isavuconazole, liposomal amphotericin B, and posaconazole. In the event that voriconazole is considered to be the most appropriate agent, based on clinical advice, for a patient with poor metabolizer genotype, voriconazole should be administered at a preferably lower than standard dosage with careful therapeutic drug monitoring.",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with recommended standard of care dosing",
+          "classification": "Strong",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include isavuconazole, liposomal amphotericin B, and posaconazole. In the event that voriconazole is considered to be the most appropriate agent, based on clinical advice, for a patient with poor metabolizer genotype, voriconazole should be administered at a preferably lower than standard dosage with careful therapeutic drug monitoring.",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include isavuconazole, liposomal amphotericin B, and posaconazole.",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities."
+        },
+        {
+          "population": "adults",
+          "phenotypes": {
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include isavuconazole, liposomal amphotericin B, and posaconazole.",
+          "classification": "Moderate",
+          "comments": "Further dose adjustments or selection of alternative therapy may be necessary due to other clinical factors, such as drug interactions, hepatic function, renal function, species, site of infection, therapeutic drug monitoring, and comorbidities. Recommendations based upon data extrapolated from patients with CYP2C19*1/*17 genotype."
+        }
+      ]
+    },
+    "fluorouracil": {
+      "drugid": "RxNorm:4492",
+      "genes": [
+        "DPYD"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "DPYD",
+          "cpiclevel": "A",
+          "citations": [
+            "23988873",
+            "29152729"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "2.0"
+          },
+          "drugrecommendation": "Based on genotype, there is no indication to change dose or therapy. Use label-recommended dosage and administration.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "1.5"
+          },
+          "drugrecommendation": "Reduce starting dose by 50% followed by titration of dose based on toxicity or therapeutic drug monitoring (if available).",
+          "classification": "Moderate",
+          "comments": "Increase the dose in patients experiencing no or clinically tolerable toxicity in the first two cycles to maintain efficacy; decrease the dose in patients who do not tolerate the starting dose to minimize toxicities."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "0.5"
+          },
+          "drugrecommendation": "Avoid use of 5-fluorouracil or 5-fluorouracil prodrug-based regimens. In the event, based on clinical advice, alternative agents are not considered a suitable therapeutic option, 5-fluorouracil should be administered at a strongly reduced dose with early therapeutic drug monitoring.",
+          "classification": "Strong",
+          "comments": "If available, a phenotyping test (see main text for further details) should be considered to estimate the starting dose. In absence of phenotyping data, a dose of <25% of the normal starting dose is estimated assuming additive effects of alleles on 5-FU clearance. Therapeutic drug monitoring should be done at the earliest time point possible (e.g., minimum time point in steady state) in order to immediately discontinue therapy if the drug level is too high."
+        }
+      ]
+    },
+    "capecitabine": {
+      "drugid": "RxNorm:194000",
+      "genes": [
+        "DPYD"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "DPYD",
+          "cpiclevel": "A",
+          "citations": [
+            "23988873",
+            "29152729"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "2.0"
+          },
+          "drugrecommendation": "Based on genotype, there is no indication to change dose or therapy. Use label-recommended dosage and administration.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "1.5"
+          },
+          "drugrecommendation": "Reduce starting dose by 50% followed by titration of dose based on toxicity or therapeutic drug monitoring (if available).",
+          "classification": "Moderate",
+          "comments": "Increase the dose in patients experiencing no or clinically tolerable toxicity in the first two cycles to maintain efficacy; decrease the dose in patients who do not tolerate the starting dose to minimize toxicities."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "DPYD": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "DPYD": "0.5"
+          },
+          "drugrecommendation": "Avoid use of 5-fluorouracil or 5-fluorouracil prodrug-based regimens. In the event, based on clinical advice, alternative agents are not considered a suitable therapeutic option, 5-fluorouracil should be administered at a strongly reduced dose with early therapeutic drug monitoring.",
+          "classification": "Strong",
+          "comments": "If available, a phenotyping test (see main text for further details) should be considered to estimate the starting dose. In absence of phenotyping data, a dose of <25% of the normal starting dose is estimated assuming additive effects of alleles on 5-FU clearance. Therapeutic drug monitoring should be done at the earliest time point possible (e.g., minimum time point in steady state) in order to immediately discontinue therapy if the drug level is too high."
+        }
+      ]
+    },
+    "irinotecan": {
+      "drugid": "RxNorm:343047",
+      "genes": [
+        "UGT1A1"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "UGT1A1",
+          "cpiclevel": "A",
+          "citations": [
+            "26417955"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "UGT1A1": "Indeterminate"
+          },
+          "activityscore": {
+            "UGT1A1": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "UGT1A1*80 is in very high linkage disequilibrium with *28 and *37. In the rare event that *80 is detected but *28 and *37 are not, there are not enough clinical data to predict metabolizer status with certainty. However, if only *80 is interrogated and the patient is heterozygous or homozygous for *80, an intermediate or poor metabolizer phenotype may be inferred, respectively."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "UGT1A1": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "UGT1A1": "n/a"
+          },
+          "drugrecommendation": "There is no need to avoid prescribing of atazanavir based on UGT1A1 genetic test result. Inform the patient that some patients stop atazanavir because of jaundice (yellow eyes and skin), but that this patient's genotype makes this unlikely (less than about a 1 in 20 chance of stopping atazanavir because of jaundice).",
+          "classification": "Strong",
+          "comments": "All studies correlating UGT1A1 genotypes with atazanavir adverse events have involved ritonavir boosting. However, concentration-time profiles are equivalent when boosted with either cobicistat or ritonavir (PMID 23532097), and bilirubin-related adverse events including discontinuation of atazanavir occur in a similar percentage of patients prescribed atazanavir with cobicistat or ritonavir (PMID 23532097). Associations between UGT1A1 genotype, bilirubin elevations, and atazanavir/r discontinuation therefore almost certainly translate to atazanavir/cobicistat."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "UGT1A1": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "UGT1A1": "n/a"
+          },
+          "drugrecommendation": "There is no need to avoid prescribing of atazanavir based on UGT1A1 genetic test result. Inform the patient that some patients stop atazanavir because of jaundice (yellow eyes and skin), but that this patient's genotype makes this unlikely (less than about a 1 in 20 chance of stopping atazanavir because of jaundice).",
+          "classification": "Strong",
+          "comments": "All studies correlating UGT1A1 genotypes with atazanavir adverse events have involved ritonavir boosting. However, concentration-time profiles are equivalent when boosted with either cobicistat or ritonavir (PMID 23532097), and bilirubin-related adverse events including discontinuation of atazanavir occur in a similar percentage of patients prescribed atazanavir with cobicistat or ritonavir (PMID 23532097). Associations between UGT1A1 genotype, bilirubin elevations, and atazanavir/r discontinuation therefore almost certainly translate to atazanavir/cobicistat. \"reference\" function refers to the UGT1A1 allele to which other alleles are compared."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "UGT1A1": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "UGT1A1": "n/a"
+          },
+          "drugrecommendation": "Consider an alternative agent particularly where jaundice would be of concern to the patient. If atazanavir is to be prescribed, there is a high likelihood of developing jaundice that will result in atazanavir discontinuation (at least 20% and as high as 60%).",
+          "classification": "Strong",
+          "comments": "All studies correlating UGT1A1 genotypes with atazanavir adverse events have involved ritonavir boosting. However, concentration-time profiles are equivalent when boosted with either cobicistat or ritonavir (PMID 23532097), and bilirubin-related adverse events including discontinuation of atazanavir occur in a similar percentage of patients prescribed atazanavir with cobicistat or ritonavir (PMID 23532097). Associations between UGT1A1 genotype, bilirubin elevations, and atazanavir/r discontinuation therefore almost certainly translate to atazanavir/cobicistat."
+        }
+      ]
+    },
+    "azathioprine": {
+      "drugid": "RxNorm:1256",
+      "genes": [
+        "TPMT",
+        "NUDT15"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "NUDT15",
+          "cpiclevel": "A",
+          "citations": [
+            "21270794",
+            "23422873",
+            "30447069",
+            "41618934"
+          ]
+        },
+        {
+          "genesymbol": "TPMT",
+          "cpiclevel": "A",
+          "citations": [
+            "21270794",
+            "23422873",
+            "30447069",
+            "41618934"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Normal Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with standard starting dose (e.g., 2 mg/kg/day for autoimmune diseases). During therapy, adjust doses of azathioprine based on disease-specific guidelines. It usually takes at least 2 weeks to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Intermediate Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with reduced starting doses (30-80% of standard starting dose) if standard starting dose is \u22652 mg/kg/day. If starting dose is already below standard starting dose, dose reduction might not be necessary. During therapy, adjust the doses of azathioprine based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 2-4 weeks of stable dosing to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Possible Intermediate Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with reduced starting doses (30-80% of standard starting dose) if standard starting dose is \u22652 mg/kg/day. If starting dose is already below standard starting dose, dose reduction might not be necessary. During therapy, adjust the doses of azathioprine based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 2-4 weeks of stable dosing to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Poor Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Consider alternative nonthiopurine immunosuppressant therapy.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Indeterminate",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Based on NUDT15, initiate therapy with standard starting dose (e.g., 2 mg/kg/day for autoimmune diseases). During therapy, adjust doses of azathioprine based on disease-specific guidelines. It usually takes at least 2 weeks to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "No Result",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Based on NUDT15, initiate therapy with standard starting dose (e.g., 2 mg/kg/day for autoimmune diseases). During therapy, adjust doses of azathioprine based on disease-specific guidelines. It usually takes at least 2 weeks to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        }
+      ]
+    },
+    "mercaptopurine": {
+      "drugid": "RxNorm:103",
+      "genes": [
+        "TPMT",
+        "NUDT15"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "NUDT15",
+          "cpiclevel": "A",
+          "citations": [
+            "21270794",
+            "23422873",
+            "30447069",
+            "41618934"
+          ]
+        },
+        {
+          "genesymbol": "TPMT",
+          "cpiclevel": "A",
+          "citations": [
+            "21270794",
+            "23422873",
+            "30447069",
+            "41618934"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Normal Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with standard starting dose of mecaptopurine (e.g., 75 mg/m2/day for malignancy or 1.5 mg/kg/day for nonmalignancy). During therapy, adjust the doses of myelosuppressive agents, as per standard clinical practice. It usually takes at least 2 weeks of stable dosing to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Intermediate Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with decreased starting doses (30-80% of standard starting dose) if starting dose is \u226575 mg/m2/day (for malignancy) or \u22651.5 mg/kg/day (for nonmalignancy). If starting dose is already below standard starting dose, dose reduction might not be necessary. During therapy, adjust mercaptopurine doses based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 2-4 weeks of stable dosing to reach steady state after each dose adjustment. If myelosuppression occurs, and the patient is on combination therapy, emphasis should be on reducing mercaptopurine over other agents.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Possible Intermediate Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Initiate therapy with decreased starting doses (30-80% of standard starting dose) if starting dose is \u226575 mg/m2/day (for malignancy) or \u22651.5 mg/kg/day (for nonmalignancy). If starting dose is already below standard starting dose, dose reduction might not be necessary. During therapy, adjust mercaptopurine doses based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 2-4 weeks of stable dosing to reach steady state after each dose adjustment. If myelosuppression occurs, and the patient is on combination therapy, emphasis should be on reducing mercaptopurine over other agents.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Poor Metabolizer",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "For malignancy: initiate therapy with drastically reduced starting doses. Reduce starting dose by 10-fold and reduce frequency to thrice weekly instead of daily (e.g. 10 mg/m2/day given 3 days/week). During therapy, adjust mercaptopurine doses based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 4-6 weeks of stable dosing to reach steady state after each dose adjustment. If myelosuppression occurs, emphasis should be on reducing mercaptopurine over other agents. For nonmalignancy: consider alternative nonthiopurine immunosuppressant therapy.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "Indeterminate",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Based on NUDT15, initiate therapy with standard starting dose of mecaptopurine (e.g., 75 mg/m2/day for malignancy or 1.5 mg/kg/day for nonmalignancy). During therapy, adjust the doses of myelosuppressive agents, as per standard clinical practice. It usually takes at least 2 weeks of stable dosing to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "TPMT": "No Result",
+            "NUDT15": "Normal Metabolizer"
+          },
+          "activityscore": {},
+          "drugrecommendation": "Based on NUDT15, initiate therapy with standard starting dose of mecaptopurine (e.g., 75 mg/m2/day for malignancy or 1.5 mg/kg/day for nonmalignancy). During therapy, adjust the doses of myelosuppressive agents, as per standard clinical practice. It usually takes at least 2 weeks of stable dosing to reach steady state after each dose adjustment.",
+          "classification": "Strong",
+          "comments": "Standard starting doses may vary by patient characteristics and/or treatment regimens and according to local clinical practice."
+        }
+      ]
+    },
+    "amitriptyline": {
+      "drugid": "RxNorm:704",
+      "genes": [
+        "CYP2D6",
+        "CYP2C19"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2C19",
+          "cpiclevel": "A",
+          "citations": [
+            "23486447",
+            "27997040"
+          ]
+        },
+        {
+          "genesymbol": "CYP2D6",
+          "cpiclevel": "A",
+          "citations": [
+            "23486447",
+            "27997040"
+          ]
+        }
+      ],
+      "recommendations": [
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider a 25% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use. If a amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "\u22655.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, consider titrating to a higher target dose (compared to normal metabolizers). Utilize therapeutic drug monitoring to guide dose adjustment.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider a 25% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Moderate",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use. If a amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Normal Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\nfor conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tricyclic use due to potential lack of efficacy. Consider alternative drug not metabolized by CYP2D6. If a TCA is warranted, consider titrating to a higher target dose (compared to normal metabolizers). Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use. If amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\n for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations \nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations \nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. For tertiary amines, consider a 50% reduction of the recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. For tertiary amines, consider a 50% reduction of the recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider alternative drug not metabolized by CYP2C19; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider alternative drug not metabolized by CYP2C19; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate, or poor metabolism in combination with CYP2C19 ultrarapid, intermediate, or poor metabolism is strongly recommended"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. If a tertiary amine is warranted, utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Rapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. If a tertiary amine is warranted, utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider alternative drug not metabolized by CYP2C19; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider alternative drug not metabolized by CYP2C19; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate, or poor metabolism in combination with CYP2C19 ultrarapid, intermediate, or poor metabolism is strongly recommended"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. If a tertiary amine is warranted, utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Ultrarapid Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. If a tertiary amine is warranted, utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider a 25% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tricyclic use due to potential for side effects. Consider alternative drug not metabolized by CYP2D6. If a TCA is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Indeterminate"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider a 25% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use. If a amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Likely Intermediate Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\nfor conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use. If amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations\n for conditions where lower initial doses are used, such as neuropathic pain. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations \nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid amitriptyline use; If amitriptyline is warranted, utilize therapeutic drug monitoring to guide dose adjustment. Utilizing therapeutic drug monitoring to guide dose adjustments is strongly recommended.",
+          "classification": "Optional",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations \nfor conditions where lower initial doses are used, such as neuropathic pain. Utilizing therapeutic drug monitoring if a tricyclic is prescribed to a patient with CYP2D6 ultrarapid, intermediate or poor metabolism in combination with CYP2C19 ultrarapid, intermediate or poor metabolism is strongly recommended."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. For tertiary amines, consider a 50% reduction of the recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "Likely Poor Metabolizer"
+          },
+          "activityscore": {
+            "CYP2D6": "No Result",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tertiary amine use due to potential for sub-optimal response. Consider alternative drug not metabolized by CYP2C19. TCAs without major CYP2C19 metabolism include the secondary amines nortriptyline and desipramine. For tertiary amines, consider a 50% reduction of the recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects. Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Intermediate Metabolizer",
+            "CYP2C19": "No Result"
+          },
+          "activityscore": {
+            "CYP2D6": "0.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Consider a 25% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Moderate",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Normal Metabolizer",
+            "CYP2C19": "No Result"
+          },
+          "activityscore": {
+            "CYP2D6": "1.25",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Initiate therapy with recommended starting dose.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Poor Metabolizer",
+            "CYP2C19": "No Result"
+          },
+          "activityscore": {
+            "CYP2D6": "0.0",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tricyclic use due to potential for side effects. Consider alternative drug not metabolized by CYP2D6. If a TCA is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Strong",
+          "comments": "Patients may receive an initial low dose of a tricyclic, which is then increased over several days to the recommended steady-state dose. The starting dose in this guideline refers to the recommended steady-state dose. Dosing recommendations only apply to higher initial doses of TCAs for treatment of conditions such as depression. See other considerations for dosing recommendations for conditions where lower initial doses are used, such as neuropathic pain."
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Ultrarapid Metabolizer",
+            "CYP2C19": "No Result"
+          },
+          "activityscore": {
+            "CYP2D6": "2.5",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "Avoid tricyclic use due to potential lack of efficacy. Consider alternative drug not metabolized by CYP2D6. If a TCA is warranted, consider titrating to a higher target dose (compared to normal metabolizers). Utilize therapeutic drug monitoring to guide dose adjustments. Titrate dose to observed clinical response with symptom improvement and minimal (if any) side effects.",
+          "classification": "Strong",
+          "comments": "n/a"
+        },
+        {
+          "population": "general",
+          "phenotypes": {
+            "CYP2D6": "Indeterminate",
+            "CYP2C19": "No Result"
+          },
+          "activityscore": {
+            "CYP2D6": "n/a",
+            "CYP2C19": "n/a"
+          },
+          "drugrecommendation": "No recommendation",
+          "classification": "No Recommendation",
+          "comments": "n/a"
+        }
+      ]
+    },
+    "warfarin": {
+      "drugid": "RxNorm:11289",
+      "genes": [
+        "CYP2C9",
+        "VKORC1",
+        "CYP4F2"
+      ],
+      "cpic_pairs": [
+        {
+          "genesymbol": "CYP2C9",
+          "cpiclevel": "A",
+          "citations": [
+            "21900891",
+            "28198005"
+          ]
+        },
+        {
+          "genesymbol": "CYP4F2",
+          "cpiclevel": "A",
+          "citations": [
+            "21900891",
+            "28198005"
+          ]
+        },
+        {
+          "genesymbol": "VKORC1",
+          "cpiclevel": "A",
+          "citations": [
+            "21900891",
+            "28198005"
+          ]
+        }
+      ],
+      "recommendations": []
+    }
+  }
+}
