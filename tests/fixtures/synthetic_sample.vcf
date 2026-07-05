@@ -1,0 +1,16 @@
+##fileformat=VCFv4.2
+##source=pharminform-synthetic-fixture
+##FILTER=<ID=PASS,Description="All filters passed">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+##contig=<ID=chr22,length=50818468>
+##contig=<ID=chr10,length=133797422>
+##contig=<ID=chr1,length=248956422>
+##contig=<ID=chr2,length=242193529>
+##contig=<ID=chr6,length=170805979>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1
+chr10	94781859	rs4244285	G	A	99	PASS	DP=45	GT:DP	0/1:45
+chr10	94981296	rs1057910	A	C	99	PASS	DP=38	GT:DP	0/1:38
+chr6	18143955	rs1142345	A	G	99	PASS	DP=30	GT:DP	1/1:30
+chr22	42126611	rs3892097	G	A	99	PASS	DP=4	GT:DP	0/1:4
