@@ -60,10 +60,10 @@
       "drug": "fluorouracil",
       "rxnorm_id": "4492",
       "contributing_genes": [
-        {"gene": "DPYD", "fraction_metabolized": 0.80, "source": "PMID:12164772 (Johnson & Diasio, implications of DPD on 5-FU pharmacogenetics: DPD catabolizes >80% of administered 5-FU); PMID:23988873 (CPIC DPYD/fluoropyrimidines guideline)"}
+        {"gene": "DPYD", "fraction_metabolized": 0.80, "source": "PMID:12164772 (Mattison LK, et al., implications of DPD on 5-FU pharmacogenetics: DPD catabolizes >80% of administered 5-FU); PMID:23988873 (Caudle KE, et al., CPIC DPYD/fluoropyrimidines guideline)"}
       ],
       "directionality": "clearance",
-      "notes": "DPYD-encoded DPD is the rate-limiting catabolic enzyme for 5-FU; reduced/absent activity causes severe, sometimes fatal toxicity from parent-drug accumulation -- the canonical example of this composite model's intended use case."
+      "notes": "DPYD-encoded DPD is the rate-limiting catabolic enzyme for 5-FU; reduced/absent activity causes severe, sometimes fatal toxicity from parent-drug accumulation -- the canonical example of this composite model's intended use case. (Corrected 2026-07: PMID:12164772 was previously misattributed to 'Johnson & Diasio' -- its actual first author, confirmed via direct PubMed fetch, is Mattison LK.)"
     },
     {
       "drug": "capecitabine",
