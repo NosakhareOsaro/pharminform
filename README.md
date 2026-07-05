@@ -14,11 +14,11 @@ affected by more than one pharmacogene.
 - [x] CPIC/DPWG guideline lookup + cache
 - [x] OMOP CDM drug_exposure mapping
 - [x] Diplotype call confidence flagging
-- [ ] Curated drug-pathway weight reference data
-- [ ] Composite multi-gene risk scoring engine
-- [ ] Directional ultrarapid-metabolizer flag
-- [ ] Composite risk test suite (monotonicity, fallback)
-- [ ] Face-validity case-report tests
+- [x] Curated drug-pathway weight reference data
+- [x] Composite multi-gene risk scoring engine
+- [x] Directional ultrarapid-metabolizer flag
+- [x] Composite risk test suite (monotonicity, fallback)
+- [x] Face-validity case-report tests
 - [ ] GeT-RM validation harness
 - [ ] Jinja2 HTML clinical report + PDF export
 - [ ] CPIC truth-set pytest suite
