@@ -109,11 +109,12 @@ TPMT\*3A and TPMT\*3C homozygous deficiency causing azathioprine-induced
 myelosuppression [@budhiraja2011tpmt3acase; @lee2013tpmt3ccase]; the
 model correctly flags Moderate/High risk in all three.
 
-Star allele calling accuracy is validated against GeT-RM
+Star allele calling accuracy is intended to be validated against GeT-RM
 (Genetic Testing Reference Materials Coordination Program) consensus
-genotypes [@pratt2016getrm; @gaedigk2019cyp2d6getrm]. At the time of this
-submission, live concordance testing has not yet been completed: this is
-stated plainly rather than omitted or fabricated. The validation harness
+genotypes [@pratt2016getrm; @gaedigk2019cyp2d6getrm], but at the time of
+this submission, that live concordance testing has not yet been
+completed -- stated plainly here rather than omitted or fabricated. The
+validation harness
 (`tests/getrm_harness.py`) is implemented and attempts a real connectivity
 check against public 1000 Genomes-hosted sequencing data for GeT-RM's
 Coriell reference samples; in the development environment this surfaced a

@@ -237,5 +237,6 @@ primary CPIC/DPWG/PharmVar sources.
 Built PharmInform: clinical pharmacogenomics platform performing
 CYP2D6/CYP2C19/DPYD star allele calling (Aldy + PharmVar), CPIC/DPWG
 dosing recommendations, an original multi-gene composite risk scoring
-model, GeT-RM-validated accuracy, and Streamlit web demo -- published to
-PyPI with Bioconda recipe and submitted to JOSS.
+model, and Streamlit web demo -- published to PyPI with Bioconda recipe
+and submitted to JOSS. (GeT-RM validation harness implemented; live
+concordance run pending -- see GeT-RM validation section above.)
