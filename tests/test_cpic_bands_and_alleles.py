@@ -198,3 +198,32 @@ def test_harness_phenotype_comparison():
     )
     # CYP2D6 *5 (whole-gene deletion) is not in the bootstrap table.
     assert compare_phenotypes("CYP2D6", "*1/*5", "*1/*1")[2] == "not_assessable"
+
+
+def test_low_depth_defining_variant_is_reported_not_silent():
+    # The synthetic fixture's CYP2D6 *4 record has DP=4: it must not be used
+    # for the call, but the confidence result must say it was there.
+    from pathlib import Path
+
+    from pharminform.confidence import assess_confidence
+
+    fixture = Path(__file__).parent / "fixtures" / "synthetic_sample.vcf"
+    dropped = {}
+    variants = caller.load_variants(fixture, min_depth=10, dropped=dropped)
+    assert variants["CYP2D6"] == []
+    assert [v.rsid for v in dropped["CYP2D6"]] == ["rs3892097"]
+    call = call_diplotype_from_vcf("CYP2D6", variants["CYP2D6"])
+    assert call.diplotype == "*1/*1"
+    conf = assess_confidence(call, all_gene_variants=variants["CYP2D6"], min_depth=10,
+                             dropped_variants=dropped["CYP2D6"])
+    assert any("excluded for low depth" in r and "rs3892097" in r for r in conf.reasons)
+
+
+def test_pipeline_surfaces_low_depth_defining_variant():
+    from pathlib import Path
+
+    from pharminform.pipeline import run_pipeline
+
+    ctx = run_pipeline(Path(__file__).parent / "fixtures" / "synthetic_sample.vcf", min_depth=10)
+    row = next(r for r in ctx.gene_results if r.gene == "CYP2D6")
+    assert any("rs3892097" in r for r in row.confidence_reasons)

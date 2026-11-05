@@ -170,6 +170,7 @@ def load_variants(
     genes: list[str] | None = None,
     min_depth: int = 10,
     require_pass: bool = True,
+    dropped: dict[str, list[VariantCall]] | None = None,
 ) -> dict[str, list[VariantCall]]:
     """Parse a VCF with cyvcf2, apply quality filters, and return variant
     calls grouped by target gene.
@@ -178,6 +179,10 @@ def load_variants(
     (when ``require_pass``) or fall below ``min_depth``; both are common
     causes of an unreliable star-allele call and are surfaced later via
     confidence.py rather than hidden here.
+
+    If ``dropped`` is given, alt-carrying records excluded by those filters
+    are collected there per gene, so a defining variant lost to low depth
+    can be reported instead of silently becoming a *1/*1 call.
     """
     genes = genes or TARGET_GENES
     path = Path(vcf_path)
@@ -203,20 +208,22 @@ def load_variants(
             records = _fallback_scan(path, region)
 
         for rec in records:
-            if require_pass and rec.FILTER not in (None, "PASS", "."):
-                continue
             depth = _extract_depth(rec)
-            if depth is not None and depth < min_depth:
-                continue
             gt_str = _genotype_string(rec)  # per-sample; assume single-sample VCF
             if not _has_alt_allele(gt_str):
                 continue
+            excluded = (require_pass and rec.FILTER not in (None, "PASS", ".")) or (
+                depth is not None and depth < min_depth
+            )
+            if excluded and dropped is None:
+                continue
+            target = dropped.setdefault(gene, []) if excluded else results[gene]
             for alt_index, alt in enumerate(rec.ALT, start=1):
                 # At a multi-allelic site, only keep the ALT(s) this sample
                 # actually carries (e.g. GT 0/2 carries ALT 2, not ALT 1).
                 if not _alt_copies(gt_str, alt_index):
                     continue
-                results[gene].append(
+                target.append(
                     VariantCall(
                         gene=gene,
                         chrom=rec.CHROM,
