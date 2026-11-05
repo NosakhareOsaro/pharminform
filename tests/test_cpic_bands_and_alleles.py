@@ -8,11 +8,11 @@ the GRCh38 DPYD and CYP2C19 regions missed *2A, c.2846A>T and *17.
 """
 
 import pytest
+from tests.getrm_harness import GRCH37_GENE_REGIONS, compare_phenotypes
 
 from pharminform import caller
 from pharminform.caller import VariantCall, call_diplotype_from_vcf, normalize_diplotype
 from pharminform.pharmgkb_client import diplotype_to_phenotype
-from tests.getrm_harness import GRCH37_GENE_REGIONS, compare_phenotypes
 
 
 def _functions(gene):
@@ -27,7 +27,8 @@ def _variant(gene, rsid, genotype="0/1", ref="A", alt="G", alt_index=1):
 
 
 # (gene, diplotype, expected phenotype) -- CPIC DPYD (PMID 29152729),
-# TPMT/NUDT15 (PMID 30447069) and UGT1A1 (PMID 26417955) guidance.
+# TPMT/NUDT15 (PMID 30447069) and UGT1A1 (PMID 26417955) guidance, plus
+# the CYP genes below.
 PHENOTYPE_CASES = [
     ("DPYD", "*1/*1", "normal metabolizer"),
     ("DPYD", "c.2846A>T/*1", "intermediate metabolizer"),
@@ -48,6 +49,23 @@ PHENOTYPE_CASES = [
     ("TPMT", "*3A/*1", "intermediate metabolizer"),
     ("TPMT", "*3B/*3C", "poor metabolizer"),
     ("TPMT", "*3A/*3A", "poor metabolizer"),
+    # CYP2C9 (PMID 32189324), CYP2C19 (PMID 35034351), CYP2D6 (PMID 31647186).
+    ("CYP2C9", "*1/*1", "normal metabolizer"),
+    ("CYP2C9", "*1/*2", "intermediate metabolizer"),
+    ("CYP2C9", "*1/*3", "intermediate metabolizer"),
+    ("CYP2C9", "*2/*2", "intermediate metabolizer"),
+    ("CYP2C9", "*2/*3", "poor metabolizer"),
+    ("CYP2C9", "*3/*3", "poor metabolizer"),
+    ("CYP2C19", "*1/*1", "normal metabolizer"),
+    ("CYP2C19", "*1/*2", "intermediate metabolizer"),
+    ("CYP2C19", "*2/*17", "intermediate metabolizer"),
+    ("CYP2C19", "*3/*17", "intermediate metabolizer"),
+    ("CYP2C19", "*2/*2", "poor metabolizer"),
+    ("CYP2C19", "*1/*17", "rapid metabolizer"),
+    ("CYP2C19", "*17/*17", "ultrarapid metabolizer"),
+    ("CYP2D6", "*1/*1", "normal metabolizer"),
+    ("CYP2D6", "*4/*1", "intermediate metabolizer"),
+    ("CYP2D6", "*4/*4", "poor metabolizer"),
 ]
 
 
@@ -227,3 +245,9 @@ def test_pipeline_surfaces_low_depth_defining_variant():
     ctx = run_pipeline(Path(__file__).parent / "fixtures" / "synthetic_sample.vcf", min_depth=10)
     row = next(r for r in ctx.gene_results if r.gene == "CYP2D6")
     assert any("rs3892097" in r for r in row.confidence_reasons)
+
+
+def test_cyp2d6_duplication_is_ultrarapid_not_rapid():
+    # CYP2D6 has no "rapid" tier in CPIC; AS 3 (e.g. *1/*1x2) is ultrarapid.
+    phenotype, score = diplotype_to_phenotype("CYP2D6", "*1/*1x2", {"*1x2": "increased function"})
+    assert (phenotype, score) == ("ultrarapid metabolizer", 3.0)

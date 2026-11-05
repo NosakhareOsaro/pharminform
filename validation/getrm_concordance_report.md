@@ -1,8 +1,8 @@
 # GeT-RM Concordance Report
 
-**Status: live concordance runs completed for CYP2D6 (below) and for DPYD,
-TPMT and UGT1A1 (see "DPYD, TPMT and UGT1A1"), against real 1000 Genomes
-sequencing data.** CYP2D6 result: 0/6 attempted samples matched their
+**Status: live concordance runs completed for all six genes against real
+1000 Genomes sequencing data: CYP2D6 (below), DPYD, TPMT and UGT1A1, and
+CYP2C9 and CYP2C19 (sections further down).** CYP2D6 result: 0/6 attempted samples matched their
 published consensus diplotype (0.0% concordance). Every mismatch has a
 specific, attributable cause explained below -- this is a real,
 informative result that confirms this project's own repeated
@@ -242,12 +242,41 @@ UGT1A1:
 - Analytical concordance on public reference data, research use only --
   not clinical validation.
 
+## CYP2C9 and CYP2C19 (live run, 5 November 2026)
+
+Same method as the DPYD/TPMT/UGT1A1 run: CDC GeT-RM consolidated table V4,
+CYP2C9 and CYP2C19 columns extracted unmodified to
+`src/pharminform/data/getrm_consolidated_v4_cyp2c.tsv`, translated by
+`tests/getrm_oncology_consensus.load_cyp2c_consensus`, run against 1000
+Genomes phase 3. Raw outcomes: `validation/getrm_cyp2c_live_results.json`.
+
+| Gene | Consensus calls | Out of panel scope | Not in 1000 Genomes | Attempted | Diplotype match | Phenotype match |
+|---|---|---|---|---|---|---|
+| CYP2C9 | 248 | 30 | 161 | 57 | 57/57 | 57/57 |
+| CYP2C19 | 248 | 59 | 127 | 62 | 62/62 | 62/62 |
+
+Carriers among the attempted samples -- CYP2C9: \*2/\*1 ×6, \*3/\*1 ×4;
+CYP2C19: \*2/\*1 ×13, \*17/\*1 ×11, \*2/\*2 ×3, \*17/\*17 ×2, \*17/\*2 ×2, \*2/\*3 ×1, \*3/\*1 ×1. Out of scope: alleles outside the panel (for
+example CYP2C9 \*5, \*8, \*9, \*11, \*13; CYP2C19 \*4, \*8, \*35) and every
+call with a parenthetical alternative such as "\*1/\*1 (\*1/\*17)".
+
+**A limit of the phenotype column.** The harness derives both phenotypes
+with PharmInform's own model, so it shows that matching diplotypes give
+matching phenotypes -- not that the model is right. Checking the model
+directly against CPIC while loading these genes found three wrong rules,
+fixed in the same change and pinned in
+`tests/test_cpic_bands_and_alleles.py`: CYP2C9 \*1/\*2 was normal (CPIC:
+intermediate) and \*2/\*3 intermediate (CPIC: poor); CYP2C19 \*2/\*17 and
+\*3/\*17 were normal (CPIC: intermediate, since CYP2C19 is assigned by
+allele function, not a summed score); CYP2D6 scores above 2.25 were
+"rapid", a tier CYP2D6 does not have (CPIC: ultrarapid).
+
 ## What's still needed
 
-1. Load the CYP2C9 and CYP2C19 consensus calls (the CDC consolidated
-   table has them) and run them the same way.
-2. Resolve the NA07048 DPYD discrepancy with the GeT-RM team.
-3. For CYP2D6, re-test with `caller.run_aldy` against real aligned reads
+1. Resolve the NA07048 DPYD discrepancy with the GeT-RM team.
+2. For CYP2D6, re-test with `caller.run_aldy` against real aligned reads
    (BAM/CRAM) rather than the VCF-only fallback, since Aldy is
    copy-number-aware; a materially larger effort (reference genome + ILP
    solver + multi-GB alignment downloads) not undertaken yet.
+3. Check the phenotype model for every gene against CPIC's published
+   diplotype-to-phenotype tables, not just the cases tested so far.
