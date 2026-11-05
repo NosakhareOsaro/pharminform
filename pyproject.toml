@@ -43,6 +43,10 @@ dev = [
     "pytest>=8.0",
     "pytest-mock>=3.14",
     "responses>=0.25",
+    # starlette>=1.x's TestClient (used by tests/test_api.py) requires httpx2.
+    "httpx2>=2.0",
+    # network.plot_drug_gene_graph imports matplotlib lazily; its test needs it.
+    "matplotlib>=3.8",
     "ruff>=0.4",
     "build>=1.2",
 ]
@@ -59,6 +63,8 @@ packages = ["src/pharminform"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Tests import shared helpers as `tests.getrm_harness` etc.
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100
