@@ -72,11 +72,15 @@ def assess_confidence(
 
     if all_gene_variants is not None:
         known_rsids = {
-            info["rsid"] for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(call.gene, {}).values()
+            rsid
+            for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(call.gene, {}).values()
+            for rsid in [info.get("rsid"), *info.get("alias_rsids", []), *info.get("proxy_rsids", [])]
+            if rsid
         }
         novel = [
             v for v in all_gene_variants
-            if v.rsid not in known_rsids and v.rsid not in (None, ".")
+            if v.rsid not in (None, ".")
+            and not any(r in known_rsids for r in v.rsid.split(";"))
         ]
         unnamed = [v for v in all_gene_variants if v.rsid in (None, ".")]
         if novel:
