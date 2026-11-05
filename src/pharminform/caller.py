@@ -33,10 +33,14 @@ TARGET_GENES = ["CYP2D6", "CYP2C19", "DPYD", "UGT1A1", "TPMT", "CYP2C9"]
 # Approximate gene regions (GRCh38), used only to subset the VCF to the
 # relevant loci before matching. Widened slightly beyond the coding sequence
 # to catch upstream/intronic defining variants (e.g. splice-site alleles).
+# Checked against Ensembl GRCh38 positions of every defining variant below:
+# an earlier DPYD entry used GRCh37 coordinates (missing *2A at
+# chr1:97450058 and c.2846A>T at chr1:97082391), and the CYP2C19 window
+# started just after the *17 promoter variant (chr10:94761900).
 GENE_REGIONS_GRCH38 = {
     "CYP2D6": "chr22:42125000-42132000",
-    "CYP2C19": "chr10:94762000-94856000",
-    "DPYD": "chr1:97543000-98387000",
+    "CYP2C19": "chr10:94760000-94856000",
+    "DPYD": "chr1:97075000-97998000",
     "UGT1A1": "chr2:233757000-233774000",
     "TPMT": "chr6:18128000-18156000",
     "CYP2C9": "chr10:94938000-94991000",
@@ -50,6 +54,22 @@ GENE_REGIONS_GRCH38 = {
 #
 # rsIDs below are widely cited in the PGx literature for these alleles;
 # verify against PharmVar/CPIC before relying on them clinically.
+#
+# Optional keys beyond rsid/ref/alt/function:
+#   alias_rsids          other IDs for the same variant (merged rsIDs, or the
+#                        ID a specific callset uses, e.g. 1000 Genomes phase 3
+#                        records the UGT1A1 TA repeat as rs34983651).
+#   proxy_rsids          markers in strong linkage disequilibrium with the
+#                        allele; a match on one of these alone reports the
+#                        allele, with proxy_note added as an ambiguity.
+#   indel_length_change  required len(ALT) - len(REF), for repeat alleles that
+#                        share one rsID (UGT1A1 *36/*28/*37 are TA5/TA7/TA8;
+#                        the reference genome carries TA6, i.e. *1).
+#   cis                  a haplotype defined by other alleles in this table
+#                        lying on the same chromosome (TPMT *3A = *3B + *3C).
+#
+# ref/alt are GRCh38 forward-strand alleles, for reference only; matching
+# is by rsID (plus indel_length_change where given).
 BOOTSTRAP_ALLELE_DEFINITIONS: dict[str, dict[str, dict]] = {
     "CYP2D6": {
         "*3": {"rsid": "rs35742686", "ref": "A", "alt": "AGT" , "function": "no function"},
@@ -69,19 +89,45 @@ BOOTSTRAP_ALLELE_DEFINITIONS: dict[str, dict[str, dict]] = {
     },
     "DPYD": {
         "*2A": {"rsid": "rs3918290", "ref": "C", "alt": "T", "function": "no function"},
-        "c.2846A>T": {"rsid": "rs67376798", "ref": "A", "alt": "T", "function": "decreased function"},
-        "c.1236G>A(HapB3)": {"rsid": "rs56038477", "ref": "G", "alt": "A", "function": "decreased function"},
+        "*13": {"rsid": "rs55886062", "ref": "A", "alt": "C", "function": "no function"},
+        "c.2846A>T": {"rsid": "rs67376798", "ref": "T", "alt": "A", "function": "decreased function"},
+        # HapB3 is tagged by c.1236G>A and its causal intronic variant
+        # c.1129-5923C>G (rs75017182); either one identifies the haplotype.
+        "c.1236G>A(HapB3)": {
+            "rsid": "rs56038477", "ref": "C", "alt": "T", "function": "decreased function",
+            "proxy_rsids": ["rs75017182"],
+        },
     },
     "UGT1A1": {
         "*6": {"rsid": "rs4148323", "ref": "G", "alt": "A", "function": "decreased function"},
-        # *28 is a TA-repeat expansion in the promoter (TA6>TA7), a repeat
-        # variant rather than a clean SNV -- flagged here rather than matched
-        # by position, since naive REF/ALT matching does not represent it well.
+        # Promoter TA repeat. Matched on the insertion/deletion length, since
+        # one rsID covers every repeat length.
+        "*28": {
+            "rsid": "rs3064744", "ref": "A(TA)6", "alt": "A(TA)7", "function": "decreased function",
+            "alias_rsids": ["rs8175347", "rs34983651"],
+            "indel_length_change": 2,
+            "proxy_rsids": ["rs887829"],
+            "proxy_note": (
+                "*28 inferred from the *80 proxy (rs887829); the TA repeat was "
+                "not observed directly -- confirm *28 before dosing irinotecan"
+            ),
+        },
+        "*36": {
+            "rsid": "rs3064744", "ref": "A(TA)6", "alt": "A(TA)5", "function": "normal function",
+            "alias_rsids": ["rs8175347"],
+            "indel_length_change": -2,
+        },
+        "*37": {
+            "rsid": "rs3064744", "ref": "A(TA)6", "alt": "A(TA)8", "function": "decreased function",
+            "alias_rsids": ["rs8175347"],
+            "indel_length_change": 4,
+        },
     },
     "TPMT": {
         "*2": {"rsid": "rs1800462", "ref": "C", "alt": "G", "function": "no function"},
-        "*3B": {"rsid": "rs1800460", "ref": "G", "alt": "A", "function": "no function"},
-        "*3C": {"rsid": "rs1142345", "ref": "A", "alt": "G", "function": "no function"},
+        "*3B": {"rsid": "rs1800460", "ref": "C", "alt": "T", "function": "no function"},
+        "*3C": {"rsid": "rs1142345", "ref": "T", "alt": "C", "function": "no function"},
+        "*3A": {"rsid": None, "cis": ["*3B", "*3C"], "function": "no function"},
     },
 }
 
@@ -106,6 +152,7 @@ class VariantCall:
     qual: float | None
     filter: str | None
     rsid: str | None = None
+    alt_index: int = 1  # which ALT allele (1-based) this call represents
 
 
 @dataclass
@@ -123,6 +170,7 @@ def load_variants(
     genes: list[str] | None = None,
     min_depth: int = 10,
     require_pass: bool = True,
+    dropped: dict[str, list[VariantCall]] | None = None,
 ) -> dict[str, list[VariantCall]]:
     """Parse a VCF with cyvcf2, apply quality filters, and return variant
     calls grouped by target gene.
@@ -131,6 +179,10 @@ def load_variants(
     (when ``require_pass``) or fall below ``min_depth``; both are common
     causes of an unreliable star-allele call and are surfaced later via
     confidence.py rather than hidden here.
+
+    If ``dropped`` is given, alt-carrying records excluded by those filters
+    are collected there per gene, so a defining variant lost to low depth
+    can be reported instead of silently becoming a *1/*1 call.
     """
     genes = genes or TARGET_GENES
     path = Path(vcf_path)
@@ -156,16 +208,22 @@ def load_variants(
             records = _fallback_scan(path, region)
 
         for rec in records:
-            if require_pass and rec.FILTER not in (None, "PASS", "."):
-                continue
             depth = _extract_depth(rec)
-            if depth is not None and depth < min_depth:
-                continue
             gt_str = _genotype_string(rec)  # per-sample; assume single-sample VCF
             if not _has_alt_allele(gt_str):
                 continue
-            for alt in rec.ALT:
-                results[gene].append(
+            excluded = (require_pass and rec.FILTER not in (None, "PASS", ".")) or (
+                depth is not None and depth < min_depth
+            )
+            if excluded and dropped is None:
+                continue
+            target = dropped.setdefault(gene, []) if excluded else results[gene]
+            for alt_index, alt in enumerate(rec.ALT, start=1):
+                # At a multi-allelic site, only keep the ALT(s) this sample
+                # actually carries (e.g. GT 0/2 carries ALT 2, not ALT 1).
+                if not _alt_copies(gt_str, alt_index):
+                    continue
+                target.append(
                     VariantCall(
                         gene=gene,
                         chrom=rec.CHROM,
@@ -177,6 +235,7 @@ def load_variants(
                         qual=rec.QUAL,
                         filter=rec.FILTER,
                         rsid=rec.ID,
+                        alt_index=alt_index,
                     )
                 )
     return results
@@ -242,6 +301,47 @@ def _has_alt_allele(genotype: str) -> bool:
     """
     alleles = genotype.replace("|", "/").split("/")
     return any(a not in ("0", ".") for a in alleles)
+
+
+def _alt_copies(genotype: str, alt_index: int = 1) -> int:
+    """Number of copies of ALT allele ``alt_index`` in a genotype string
+    ("0/1" -> 1, "1|1" -> 2, "1/2" -> 1 for either ALT, "0/0" -> 0)."""
+    return genotype.replace("|", "/").split("/").count(str(alt_index))
+
+
+def _alt_haplotypes(genotype: str, alt_index: int = 1) -> tuple[bool, ...] | None:
+    """For a phased genotype, which haplotypes carry the ALT allele
+    ("1|0" -> (True, False)); None when the genotype is unphased."""
+    if "|" not in genotype:
+        return None
+    return tuple(a == str(alt_index) for a in genotype.split("|"))
+
+
+def _split_rsids(rsid: str | None) -> list[str]:
+    # Some callsets join several IDs with ";" (e.g. "rs123;rs456").
+    return [r for r in (rsid or "").split(";") if r and r != "."]
+
+
+def _allele_sort_key(allele: str) -> tuple:
+    if allele.startswith("*"):
+        digits = ""
+        for ch in allele[1:]:
+            if not ch.isdigit():
+                break
+            digits += ch
+        if digits:
+            return (0, int(digits), allele)
+    return (1, 0, allele)
+
+
+def normalize_diplotype(diplotype: str) -> str:
+    """Put a diplotype's two alleles in a canonical order ("*2A/*1" ->
+    "*1/*2A"), so calls can be compared with consensus genotypes regardless
+    of which allele was written first."""
+    alleles = diplotype.split("/")
+    if len(alleles) != 2:
+        return diplotype
+    return "/".join(sorted(alleles, key=_allele_sort_key))
 
 
 def aldy_available() -> bool:
@@ -327,31 +427,91 @@ def call_diplotype_from_vcf(
     this path. See confidence.py, which flags this explicitly.
     """
     defs = allele_definitions or BOOTSTRAP_ALLELE_DEFINITIONS.get(gene, {})
-    observed: list[tuple[str, str]] = []  # (allele_name, zygosity)
 
-    by_rsid = {info["rsid"]: name for name, info in defs.items()}
+    # rsID -> [(allele_name, definition, matched_via_proxy)]. Several alleles
+    # can share an rsID (UGT1A1 repeat lengths), and one allele can have
+    # several IDs (aliases, LD proxies).
+    lookup: dict[str, list[tuple[str, dict, bool]]] = {}
+    for name, info in defs.items():
+        for rsid in [info.get("rsid"), *info.get("alias_rsids", [])]:
+            if rsid:
+                lookup.setdefault(rsid, []).append((name, info, False))
+        for rsid in info.get("proxy_rsids", []):
+            lookup.setdefault(rsid, []).append((name, info, True))
+
+    copies: dict[str, int] = {}
+    haplotypes: dict[str, tuple[bool, ...] | None] = {}
+    seen_directly: set[str] = set()
 
     for v in variants:
-        if v.rsid in by_rsid and _has_alt_allele(v.genotype):
-            allele_name = by_rsid[v.rsid]
-            zygosity = "hom" if v.genotype in ("1/1", "1|1") else "het"
-            observed.append((allele_name, zygosity))
+        n = _alt_copies(v.genotype, v.alt_index)
+        if not n:
+            continue
+        for rsid in _split_rsids(v.rsid):
+            for name, info, via_proxy in lookup.get(rsid, []):
+                # The length check applies to the repeat itself, not to an
+                # SNV proxy for it (UGT1A1 *80 for *28).
+                change = info.get("indel_length_change")
+                if change is not None and not via_proxy and len(v.alt) - len(v.ref) != change:
+                    continue
+                # Several markers for one allele count once, not as two
+                # separate allele copies.
+                copies[name] = max(copies.get(name, 0), n)
+                haplotypes.setdefault(name, _alt_haplotypes(v.genotype, v.alt_index))
+                if not via_proxy:
+                    seen_directly.add(name)
 
-    if not observed:
+    ambiguous: list[str] = []
+
+    for name, info in defs.items():
+        if name in copies and name not in seen_directly and info.get("proxy_note"):
+            ambiguous.append(info["proxy_note"])
+
+    # Haplotypes made of other alleles in cis (TPMT *3A = *3B + *3C).
+    for name, info in defs.items():
+        parts = info.get("cis")
+        if not parts or not all(p in copies for p in parts):
+            continue
+        n_cis = min(copies[p] for p in parts)
+        if all(copies[p] == 1 for p in parts):
+            phases = [haplotypes.get(p) for p in parts]
+            if all(phases):
+                if len(set(phases)) > 1:
+                    n_cis = 0  # phased onto different chromosomes: in trans
+            else:
+                ambiguous.append(
+                    f"{name} assumed ({' + '.join(parts)} in cis, the common "
+                    f"arrangement); {'/'.join(parts)} in trans is also possible "
+                    "and would be a poor metabolizer -- phasing needed to confirm"
+                )
+        if n_cis:
+            copies[name] = n_cis
+            for p in parts:
+                copies[p] -= n_cis
+                if not copies[p]:
+                    del copies[p]
+
+    alleles = sorted(a for name, n in copies.items() for a in [name] * n)
+
+    if not alleles:
         return DiplotypeCall(gene=gene, diplotype="*1/*1", method="rule_based_vcf")
 
-    if len(observed) == 1:
-        name, zygosity = observed[0]
-        diplotype = f"{name}/{name}" if zygosity == "hom" else f"{name}/*1"
-        return DiplotypeCall(gene=gene, diplotype=diplotype, method="rule_based_vcf", matched_variants=variants)
+    if len(alleles) == 1:
+        diplotype = f"{alleles[0]}/*1"
+    else:
+        diplotype = "/".join(alleles[:2])
+        distinct = sorted(set(alleles))
+        in_trans = len(distinct) == 2 and all(haplotypes.get(a) for a in distinct) and (
+            haplotypes[distinct[0]] != haplotypes[distinct[1]]
+        )
+        if len(alleles) > 2 or (len(distinct) > 1 and not in_trans and not any(
+            defs[a].get("cis") for a in distinct
+        )):
+            # Without phasing a VCF cannot tell whether variants are in cis
+            # (same allele) or trans (two different variant alleles). Report
+            # the naive combination as the top candidate and list alternatives.
+            ambiguous.append(f"phase unresolved among: {', '.join(distinct)}")
 
-    # More than one defining variant observed -- without phasing information
-    # a VCF cannot tell us whether they're in cis (same allele, e.g. a
-    # multi-SNV star allele) or trans (two different variant alleles). Report
-    # the naive combination as the top candidate and list alternatives.
-    names = [n for n, _ in observed]
-    diplotype = "/".join(sorted(set(names))[:2]) if len(set(names)) > 1 else f"{names[0]}/{names[0]}"
-    ambiguous = [f"phase unresolved among: {', '.join(sorted(set(names)))}"]
     return DiplotypeCall(
         gene=gene,
         diplotype=diplotype,

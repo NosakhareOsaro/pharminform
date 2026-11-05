@@ -51,19 +51,34 @@ DEFAULT_ACTIVITY_BANDS: list[tuple[float, float, str]] = [
 ]
 
 # Per-gene overrides where the generic bands above are known to diverge
-# from CPIC's published gene-specific standardization. TPMT and DPYD are
-# conventionally reported as a three-tier (PM/IM/NM) system in CPIC
-# guidance rather than the five-tier CYP2D6-style system.
+# from CPIC's published gene-specific standardization. TPMT, DPYD and
+# UGT1A1 are reported as a three-tier (PM/IM/NM) system in CPIC guidance
+# rather than the five-tier CYP2D6-style system.
+#
+# DPYD follows the CPIC DPYD activity score (Amstutz 2018, PMID 29152729):
+# AS 0-0.5 = poor, 1-1.5 = intermediate, 2 = normal. A single decreased
+# function allele (c.2846A>T, HapB3) is therefore intermediate (AS 1.5),
+# not normal. TPMT is assigned by allele function rather than an activity
+# score (Relling 2019, PMID 30447069); under this model one no-function
+# allele (AS 1) is intermediate and two (AS 0) are poor. UGT1A1 is also
+# function-based (Gammal 2016, PMID 26417955; CPIC 2020 update): one
+# decreased-function allele (*1/*28, *1/*6) is intermediate and two
+# (*28/*28, *6/*28, *6/*6) are poor.
 ACTIVITY_BAND_OVERRIDES: dict[str, list[tuple[float, float, str]]] = {
     "TPMT": [
-        (0.0, 0.0, "poor metabolizer"),
-        (0.25, 1.0, "intermediate metabolizer"),
-        (1.25, 4.0, "normal metabolizer"),
+        (0.0, 0.5, "poor metabolizer"),
+        (0.75, 1.5, "intermediate metabolizer"),
+        (1.75, 4.0, "normal metabolizer"),
     ],
     "DPYD": [
-        (0.0, 0.0, "poor metabolizer"),
-        (0.25, 1.0, "intermediate metabolizer"),
-        (1.25, 4.0, "normal metabolizer"),
+        (0.0, 0.5, "poor metabolizer"),
+        (0.75, 1.5, "intermediate metabolizer"),
+        (1.75, 4.0, "normal metabolizer"),
+    ],
+    "UGT1A1": [
+        (0.0, 1.0, "poor metabolizer"),
+        (1.25, 1.75, "intermediate metabolizer"),
+        (2.0, 4.0, "normal metabolizer"),
     ],
 }
 

@@ -24,7 +24,8 @@ def run_pipeline(
     genes: list[str] | None = None,
 ) -> ReportContext:
     genes = genes or caller.TARGET_GENES
-    variants_by_gene = caller.load_variants(vcf_path, genes=genes, min_depth=min_depth)
+    dropped_by_gene: dict[str, list[caller.VariantCall]] = {}
+    variants_by_gene = caller.load_variants(vcf_path, genes=genes, min_depth=min_depth, dropped=dropped_by_gene)
 
     gene_rows: list[GeneReportRow] = []
     gene_phenotypes: dict[str, str] = {}
@@ -32,7 +33,10 @@ def run_pipeline(
     for gene in genes:
         gene_variants = variants_by_gene.get(gene, [])
         call = caller.call_diplotype_from_vcf(gene, gene_variants)
-        conf = assess_confidence(call, all_gene_variants=gene_variants, min_depth=min_depth)
+        conf = assess_confidence(
+            call, all_gene_variants=gene_variants, min_depth=min_depth,
+            dropped_variants=dropped_by_gene.get(gene),
+        )
 
         allele_functions = {
             name: info["function"]
