@@ -1,5 +1,6 @@
-"""GeT-RM consensus genotypes for DPYD, TPMT and UGT1A1, translated into
-the call PharmInform's allele table is expected to make.
+"""GeT-RM consensus genotypes for DPYD, TPMT and UGT1A1 (and CYP2C9 and
+CYP2C19), translated into the call PharmInform's allele table is expected
+to make.
 
 Source: CDC GeT-RM "Consolidated Table of all GeT-RM Pharmacogenetic and
 HLA Reference Material Genotypes", V4 (1-22-25),
@@ -10,6 +11,9 @@ Coriell ID, CYP2D6, DPYD, NUDT15, TPMT and UGT1A1 columns (rows with any
 DPYD/TPMT/UGT1A1 value; cells trimmed, tabs/newlines collapsed to spaces),
 SHA-256 3a329a683efde66af1d1ea58eeb84b58508879aace4b9a697ecae78f55e0cb5f,
 checked against the same extract taken from the downloaded workbook.
+``getrm_consolidated_v4_cyp2c.tsv`` is the same kind of extract of the
+CYP2C9 and CYP2C19 columns (rows with either value), SHA-256
+ae0769c0bd5dbfd9e3735a82efbb815b73337e7c3c9292ea1cb045c65836eebf.
 
 The consensus uses the full star-allele / HGVS nomenclature; the bootstrap
 table only knows a few alleles per gene. Each sample is therefore either
@@ -25,6 +29,10 @@ reason -- never guessed:
 * UGT1A1: *60 (-3279T>G, not in the panel) reads as *1, and the *28 + *60
   haplotype as *28. Tentative calls in parentheses other than "(*60)", and
   alleles outside *1/*6/*28/*36/*37, put the sample out of scope.
+* CYP2C9 and CYP2C19: in scope only when every allele is in the panel
+  (*1/*2/*3, and *17 for CYP2C19). Calls with a parenthetical alternative
+  genotype ("*1/*1 (*1/*17)"), "or", "novel" or "undefined" are out of
+  scope rather than resolved either way.
 
 Comparing the panel call is a test of what the caller claims to detect.
 It says nothing about the alleles it cannot see; the out-of-scope count is
@@ -38,7 +46,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-TSV_PATH = Path(__file__).parent.parent / "src" / "pharminform" / "data" / "getrm_consolidated_v4_oncology.tsv"
+DATA_DIR = Path(__file__).parent.parent / "src" / "pharminform" / "data"
+TSV_PATH = DATA_DIR / "getrm_consolidated_v4_oncology.tsv"
+CYP2C_TSV_PATH = DATA_DIR / "getrm_consolidated_v4_cyp2c.tsv"
 
 DPYD_ACTIONABLE = {
     "c.1905+1G>A": "*2A",
@@ -52,6 +62,8 @@ DPYD_NORMAL_STARS = {"*1", "*9", "*4", "(*4)"}
 
 TPMT_PANEL = {"*1", "*2", "*3A", "*3B", "*3C"}
 UGT1A1_PANEL = {"*1", "*6", "*28", "*36", "*37"}
+CYP2C9_PANEL = {"*1", "*2", "*3"}
+CYP2C19_PANEL = {"*1", "*2", "*3", "*17"}
 
 
 @dataclass
@@ -139,20 +151,43 @@ def translate_ugt1a1(raw: str) -> tuple[str | None, str]:
     return _diplotype(alleles), ""
 
 
+def _translate_panel(raw: str, panel: set[str]) -> tuple[str | None, str]:
+    alleles = raw.split("/")
+    if len(alleles) != 2 or not all(a.strip() in panel for a in alleles):
+        return None, f"alternative, tentative or out-of-panel call: {raw}"
+    return _diplotype([a.strip() for a in alleles]), ""
+
+
+def translate_cyp2c9(raw: str) -> tuple[str | None, str]:
+    return _translate_panel(raw, CYP2C9_PANEL)
+
+
+def translate_cyp2c19(raw: str) -> tuple[str | None, str]:
+    return _translate_panel(raw, CYP2C19_PANEL)
+
+
 TRANSLATORS = {"DPYD": translate_dpyd, "TPMT": translate_tpmt, "UGT1A1": translate_ugt1a1}
+CYP2C_TRANSLATORS = {"CYP2C9": translate_cyp2c9, "CYP2C19": translate_cyp2c19}
 
 
-def load_oncology_consensus(path: Path | str = TSV_PATH) -> list[ConsensusEntry]:
+def load_oncology_consensus(
+    path: Path | str = TSV_PATH, translators: dict | None = None
+) -> list[ConsensusEntry]:
+    translators = translators or TRANSLATORS
     entries: list[ConsensusEntry] = []
     with open(path, newline="") as fh:
         for row in csv.DictReader(fh, delimiter="\t"):
-            for gene, translate in TRANSLATORS.items():
+            for gene, translate in translators.items():
                 raw = row[gene].strip()
                 if not raw:
                     continue
                 expected, note = translate(raw)
                 entries.append(ConsensusEntry(row["coriell_id"], gene, raw, expected, note))
     return entries
+
+
+def load_cyp2c_consensus(path: Path | str = CYP2C_TSV_PATH) -> list[ConsensusEntry]:
+    return load_oncology_consensus(path, CYP2C_TRANSLATORS)
 
 
 def in_scope_samples(entries: list[ConsensusEntry] | None = None) -> list[dict]:

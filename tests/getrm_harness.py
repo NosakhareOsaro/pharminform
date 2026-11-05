@@ -34,7 +34,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import cyvcf2
@@ -78,7 +78,8 @@ GRCH37_GENE_REGIONS = {
     "TPMT": ("6", 18_125_000, 18_158_000),
 }
 
-# GRCh37 positions of the defining variants in DPYD, TPMT and UGT1A1
+# GRCh37 positions of the defining variants in DPYD, TPMT, UGT1A1, CYP2C19
+# and CYP2C9
 # (Ensembl GRCh37). DPYD spans ~850 kb, and each remote fetch pulls every
 # sample's data for the requested range, so for these genes only small
 # windows around the defining sites are fetched. The rule-based caller
@@ -87,6 +88,8 @@ GRCH37_DEFINING_SITES = {
     "DPYD": [97_915_614, 97_981_343, 97_547_947, 98_039_419, 98_045_449],
     "TPMT": [18_143_955, 18_139_228, 18_130_918],
     "UGT1A1": [234_669_144, 234_668_879, 234_668_880, 234_668_570],
+    "CYP2C19": [96_541_616, 96_540_410, 96_521_657],
+    "CYP2C9": [96_702_047, 96_741_053],
 }
 SITE_WINDOW = 25
 
@@ -125,7 +128,9 @@ def fetch_1000genomes_panel_samples() -> set[str]:
     """Fetch the real 1000 Genomes phase 3 sample panel and return the set
     of sample IDs. Raises SequencingDataUnavailable on any network failure
     -- never returns a guessed/cached list presented as live data."""
-    proc = subprocess.run(["curl", "-s", "-f", ONE_KG_PANEL_URL], capture_output=True, text=True, timeout=60)
+    proc = subprocess.run(
+        ["curl", "-s", "-f", ONE_KG_PANEL_URL], capture_output=True, text=True, timeout=60, check=False
+    )
     if proc.returncode != 0 or not proc.stdout:
         raise SequencingDataUnavailable(
             f"Could not fetch the 1000 Genomes sample panel from {ONE_KG_PANEL_URL}"
@@ -168,7 +173,7 @@ def fetch_1000genomes_regions(chrom: str, spans: list[tuple[int, int]], sample: 
             merged.append([start, end])
     regions = ",".join(f"{chrom}:{start}-{end}" for start, end in merged)
     cmd = ["bcftools", "view", "-r", regions, "-s", sample, url]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=False)
     if proc.returncode != 0:
         raise SequencingDataUnavailable(
             f"bcftools failed fetching {regions} for {sample}: {proc.stderr.strip()}"
