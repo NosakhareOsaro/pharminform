@@ -64,7 +64,24 @@ DEFAULT_ACTIVITY_BANDS: list[tuple[float, float, str]] = [
 # function-based (Gammal 2016, PMID 26417955; CPIC 2020 update): one
 # decreased-function allele (*1/*28, *1/*6) is intermediate and two
 # (*28/*28, *6/*28, *6/*6) are poor.
+#
+# CYP2C9 follows the CPIC activity score (Theken 2020, PMID 32189324):
+# AS 2 = normal, 1-1.5 = intermediate (so *1/*2 is intermediate), 0-0.5 =
+# poor (so *2/*3 is poor). CYP2D6 (Caudle 2020 standardization, PMID
+# 31647186) has no "rapid" tier: above AS 2.25 is ultrarapid. CYP2C19 is
+# not an activity-score gene at all -- see _cyp2c19_phenotype.
 ACTIVITY_BAND_OVERRIDES: dict[str, list[tuple[float, float, str]]] = {
+    "CYP2C9": [
+        (0.0, 0.5, "poor metabolizer"),
+        (0.75, 1.5, "intermediate metabolizer"),
+        (1.75, 4.0, "normal metabolizer"),
+    ],
+    "CYP2D6": [
+        (0.0, 0.0, "poor metabolizer"),
+        (0.25, 1.0, "intermediate metabolizer"),
+        (1.25, 2.25, "normal metabolizer"),
+        (2.5, float("inf"), "ultrarapid metabolizer"),
+    ],
     "TPMT": [
         (0.0, 0.5, "poor metabolizer"),
         (0.75, 1.5, "intermediate metabolizer"),
@@ -128,12 +145,40 @@ def diplotype_activity_score(
     return total
 
 
+def _cyp2c19_phenotype(diplotype: str, allele_functions: dict[str, str]) -> str:
+    """CPIC CYP2C19 phenotypes are assigned from allele functions, not a
+    summed score (Lee 2022, PMID 35034351): one no-function allele makes an
+    intermediate metabolizer even when the other allele is increased
+    function (*2/*17), which a summed score would call normal."""
+    functions = [
+        allele_functions.get(a, "normal function" if a == "*1" else "unknown function")
+        for a in diplotype.split("/")
+    ]
+    no_function = functions.count("no function")
+    decreased = functions.count("decreased function")
+    increased = functions.count("increased function")
+    if no_function == 2:
+        return "poor metabolizer"
+    if no_function == 1 or decreased:
+        # CPIC calls a decreased-function combination "likely intermediate";
+        # reported here as intermediate.
+        return "intermediate metabolizer"
+    if increased == 2:
+        return "ultrarapid metabolizer"
+    if increased == 1:
+        return "rapid metabolizer"
+    return "normal metabolizer"
+
+
 def diplotype_to_phenotype(
     gene: str, diplotype: str, allele_functions: dict[str, str]
 ) -> tuple[str, float]:
     """Convert a diplotype to a CPIC-style phenotype using the activity
-    score model. Returns (phenotype, activity_score)."""
+    score model (or, for CYP2C19, CPIC's allele-function rules). Returns
+    (phenotype, activity_score)."""
     score = diplotype_activity_score(diplotype, allele_functions)
+    if gene == "CYP2C19":
+        return _cyp2c19_phenotype(diplotype, allele_functions), score
     bands = ACTIVITY_BAND_OVERRIDES.get(gene, DEFAULT_ACTIVITY_BANDS)
     for low, high, phenotype in bands:
         if low <= score <= high:

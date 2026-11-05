@@ -34,7 +34,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import cyvcf2
@@ -78,7 +78,8 @@ GRCH37_GENE_REGIONS = {
     "TPMT": ("6", 18_125_000, 18_158_000),
 }
 
-# GRCh37 positions of the defining variants in DPYD, TPMT and UGT1A1
+# GRCh37 positions of the defining variants in DPYD, TPMT, UGT1A1, CYP2C19
+# and CYP2C9
 # (Ensembl GRCh37). DPYD spans ~850 kb, and each remote fetch pulls every
 # sample's data for the requested range, so for these genes only small
 # windows around the defining sites are fetched. The rule-based caller
@@ -87,6 +88,8 @@ GRCH37_DEFINING_SITES = {
     "DPYD": [97_915_614, 97_981_343, 97_547_947, 98_039_419, 98_045_449],
     "TPMT": [18_143_955, 18_139_228, 18_130_918],
     "UGT1A1": [234_669_144, 234_668_879, 234_668_880, 234_668_570],
+    "CYP2C19": [96_541_616, 96_540_410, 96_521_657],
+    "CYP2C9": [96_702_047, 96_741_053],
 }
 SITE_WINDOW = 25
 
