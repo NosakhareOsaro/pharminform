@@ -1,5 +1,4 @@
 import pytest
-
 from tests.getrm_harness import (
     SequencingDataUnavailable,
     bcftools_available,

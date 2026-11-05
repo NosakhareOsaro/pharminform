@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -30,11 +31,18 @@ def show_version() -> None:
 
 @app.command("report")
 def make_report(
-    vcf: Path = typer.Option(..., "--vcf", exists=True, readable=True, help="Input VCF file"),
-    out: Path = typer.Option(..., "--out", help="Output HTML report path"),
-    pdf: Path | None = typer.Option(None, "--pdf", help="Also write a PDF report to this path"),
-    min_depth: int = typer.Option(20, "--min-depth", help="Minimum read depth to trust a defining variant"),
-    patient_id: str | None = typer.Option(None, "--patient-id", help="Optional patient/sample label for the report"),
+    vcf: Annotated[Path, typer.Option("--vcf", exists=True, readable=True, help="Input VCF file")],
+    out: Annotated[Path, typer.Option("--out", help="Output HTML report path")],
+    pdf: Annotated[
+        Path | None, typer.Option("--pdf", help="Also write a PDF report to this path")
+    ] = None,
+    min_depth: Annotated[
+        int, typer.Option("--min-depth", help="Minimum read depth to trust a defining variant")
+    ] = 20,
+    patient_id: Annotated[
+        str | None,
+        typer.Option("--patient-id", help="Optional patient/sample label for the report"),
+    ] = None,
 ) -> None:
     """Call star alleles from a VCF and generate a PGx clinical report."""
     typer.echo(f"Loading and calling variants from {vcf} (min depth {min_depth})...")

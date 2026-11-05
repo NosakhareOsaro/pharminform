@@ -24,7 +24,7 @@ below).
 - [x] Directional ultrarapid-metabolizer flag
 - [x] Composite risk test suite (monotonicity, fallback)
 - [x] Face-validity case-report tests
-- [x] GeT-RM validation: live concordance runs completed -- DPYD 63/64, TPMT 60/60, UGT1A1 37/41 diplotypes (41/41 phenotypes); CYP2D6 0/6 (see below; CYP2C9/CYP2C19 not yet loaded)
+- [x] GeT-RM validation: live concordance runs completed -- DPYD 63/64, TPMT 60/60, UGT1A1 37/41 diplotypes (41/41 phenotypes), CYP2C9 57/57, CYP2C19 62/62; CYP2D6 0/6 (see below)
 - [x] Jinja2 HTML clinical report + PDF export
 - [x] CPIC truth-set pytest suite
 - [x] CLI
@@ -154,7 +154,7 @@ account-issued API key) or for running Aldy directly against aligned reads.
 
 ## GeT-RM validation
 
-**DPYD, TPMT and UGT1A1.** Consensus genotypes from the CDC GeT-RM
+**DPYD, TPMT, UGT1A1, CYP2C9 and CYP2C19.** Consensus genotypes from the CDC GeT-RM
 consolidated table (V4, 1-22-25) were translated to the calls the
 bootstrap allele table can make, and the samples that are also in 1000
 Genomes phase 3 were run through the real pipeline:
@@ -164,15 +164,20 @@ Genomes phase 3 were run through the real pipeline:
 | DPYD | 64 | 63 | 63 |
 | TPMT | 60 | 60 | 60 |
 | UGT1A1 | 41 | 37 | 41 |
+| CYP2C9 | 57 | 57 | 57 |
+| CYP2C19 | 62 | 62 | 62 |
 
 The one DPYD mismatch (NA07048) is a sample both 1000 Genomes call sets
 show as heterozygous for c.2846A>T while the GeT-RM consensus says
 \*1/\*1 -- the caller reports what the data contains, and the discrepancy
 is unresolved. The four UGT1A1 mismatches are \*36/\*37 repeat lengths
 that phase 3 does not represent; their phenotypes still match. Carriers
-are few (5 DPYD, 7 TPMT, 28 UGT1A1), samples with alleles outside the
+are few (5 DPYD, 7 TPMT, 28 UGT1A1, 10 CYP2C9, 33 CYP2C19), samples with alleles outside the
 panel are excluded and counted, and this is analytical testing on public
-reference data for research use, not clinical validation. Details in
+reference data for research use, not clinical validation. The phenotype
+column uses PharmInform's own model on both sides, so it does not test the
+model itself; that is covered by the CPIC cases in
+`tests/test_cpic_bands_and_alleles.py`. Details in
 [`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
 
 **CYP2D6.** A live concordance run against published GeT-RM consensus genotypes has

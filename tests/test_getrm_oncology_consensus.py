@@ -1,8 +1,12 @@
 import hashlib
 
 from tests.getrm_oncology_consensus import (
+    CYP2C_TSV_PATH,
     TSV_PATH,
+    load_cyp2c_consensus,
     load_oncology_consensus,
+    translate_cyp2c9,
+    translate_cyp2c19,
     translate_dpyd,
     translate_tpmt,
     translate_ugt1a1,
@@ -45,4 +49,25 @@ def test_ugt1a1_translation():
 def test_every_entry_is_translated_or_explained():
     entries = load_oncology_consensus()
     assert {e.gene for e in entries} == {"DPYD", "TPMT", "UGT1A1"}
+    assert all(e.consensus_diplotype or e.scope_note for e in entries)
+
+
+def test_cyp2c_extract_is_unmodified():
+    digest = hashlib.sha256(CYP2C_TSV_PATH.read_bytes()).hexdigest()
+    assert digest == "ae0769c0bd5dbfd9e3735a82efbb815b73337e7c3c9292ea1cb045c65836eebf"
+
+
+def test_cyp2c_translation():
+    assert translate_cyp2c9("*2/*3") == ("*2/*3", "")
+    assert translate_cyp2c9("*1/*13")[0] is None
+    assert translate_cyp2c9("*1/*1 (*1/*9)")[0] is None
+    assert translate_cyp2c9("*1/undefined")[0] is None
+    assert translate_cyp2c19("*2/*17") == ("*17/*2", "")
+    assert translate_cyp2c19("*1/*1 (*1/*17)")[0] is None
+    assert translate_cyp2c19("*1/*4 or *4/*17")[0] is None
+
+
+def test_every_cyp2c_entry_is_translated_or_explained():
+    entries = load_cyp2c_consensus()
+    assert {e.gene for e in entries} == {"CYP2C9", "CYP2C19"}
     assert all(e.consensus_diplotype or e.scope_note for e in entries)

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+from typing import Annotated
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -30,7 +31,7 @@ def health() -> dict:
 
 @app.post("/report")
 async def create_report(
-    vcf: UploadFile = File(...),
+    vcf: Annotated[UploadFile, File()],
     min_depth: int = Query(20, ge=1),
     patient_id: str | None = Query(None),
 ) -> JSONResponse:
@@ -56,7 +57,7 @@ async def create_report(
 
 @app.post("/report/html", response_class=HTMLResponse)
 async def create_report_html(
-    vcf: UploadFile = File(...),
+    vcf: Annotated[UploadFile, File()],
     min_depth: int = Query(20, ge=1),
     patient_id: str | None = Query(None),
 ) -> HTMLResponse:

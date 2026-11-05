@@ -21,6 +21,7 @@ different problems:
 
 from __future__ import annotations
 
+import contextlib
 import shutil
 import subprocess
 from dataclasses import dataclass, field
@@ -202,9 +203,10 @@ def load_variants(
             continue
         try:
             records = list(vcf(region))
-        except Exception:
-            # No tabix/CSI index, or region string didn't match this VCF's
-            # contig naming (e.g. "22" vs "chr22") -- fall back to a full scan.
+        except (AssertionError, OSError, ValueError):
+            # No tabix/CSI index (cyvcf2 raises AssertionError), or region
+            # string didn't match this VCF's contig naming (e.g. "22" vs
+            # "chr22") -- fall back to a full scan.
             records = _fallback_scan(path, region)
 
         for rec in records:
@@ -249,29 +251,25 @@ def _fallback_scan(path: Path, region: str) -> list:
     for candidate in (chrom, alt_chrom):
         try:
             vcf = cyvcf2.VCF(str(path))
-            for rec in vcf:
-                if rec.CHROM == candidate and start <= rec.POS <= end:
-                    out.append(rec)
-        except Exception:
+        except OSError:
             continue
+        out.extend(rec for rec in vcf if rec.CHROM == candidate and start <= rec.POS <= end)
         if out:
             break
     return out
 
 
 def _extract_depth(rec) -> int | None:
-    try:
+    # INFO/DP can be absent (None), multi-valued (a tuple) or non-numeric;
+    # FORMAT/DP raises KeyError when the header doesn't declare it.
+    with contextlib.suppress(TypeError, ValueError):
         dp = rec.INFO.get("DP")
         if dp is not None:
             return int(dp)
-    except Exception:
-        pass
-    try:
+    with contextlib.suppress(KeyError, IndexError, TypeError, ValueError):
         fmt_dp = rec.format("DP")
         if fmt_dp is not None and len(fmt_dp):
             return int(fmt_dp[0][0])
-    except Exception:
-        pass
     return None
 
 
@@ -281,7 +279,7 @@ def _genotype_string(rec) -> str:
         alleles = "/".join(str(a) for a in gt[:-1])
         phased = "|" if len(gt) > 2 and gt[-1] else "/"
         return alleles.replace("/", phased) if phased == "|" else alleles
-    except Exception:
+    except (IndexError, TypeError):  # no sample columns
         return "./."
 
 
@@ -384,7 +382,7 @@ def run_aldy(
         "-o", str(out_file),
         str(bam_path),
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if proc.returncode != 0:
         raise RuntimeError(f"aldy genotype failed for {gene}: {proc.stderr.strip()}")
 
