@@ -78,6 +78,18 @@ GRCH37_GENE_REGIONS = {
     "TPMT": ("6", 18_125_000, 18_158_000),
 }
 
+# GRCh37 positions of the defining variants in DPYD, TPMT and UGT1A1
+# (Ensembl GRCh37). DPYD spans ~850 kb, and each remote fetch pulls every
+# sample's data for the requested range, so for these genes only small
+# windows around the defining sites are fetched. The rule-based caller
+# only uses those sites, so the call is the same.
+GRCH37_DEFINING_SITES = {
+    "DPYD": [97_915_614, 97_981_343, 97_547_947, 98_039_419, 98_045_449],
+    "TPMT": [18_143_955, 18_139_228, 18_130_918],
+    "UGT1A1": [234_669_144, 234_668_879, 234_668_880, 234_668_570],
+}
+SITE_WINDOW = 25
+
 
 class SequencingDataUnavailable(RuntimeError):
     """Raised when the sequencing data needed for a real concordance check
@@ -124,6 +136,10 @@ def fetch_1000genomes_panel_samples() -> set[str]:
 
 
 def fetch_1000genomes_region(chrom: str, start: int, end: int, sample: str) -> str:
+    return fetch_1000genomes_regions(chrom, [(start, end)], sample)
+
+
+def fetch_1000genomes_regions(chrom: str, spans: list[tuple[int, int]], sample: str) -> str:
     """Fetch a small region of a 1000 Genomes phase 3 VCF for one sample via
     bcftools (remote HTTPS + tabix range requests). Requires bcftools on
     PATH. Raises SequencingDataUnavailable with actionable instructions
@@ -143,11 +159,19 @@ def fetch_1000genomes_region(chrom: str, start: int, end: int, sample: str) -> s
             f"No indexed 1000 Genomes URL configured for chr{chrom} in "
             "ONE_KG_CHROM_FILES; add it to extend coverage."
         )
-    cmd = ["bcftools", "view", "-r", f"{chrom}:{start}-{end}", "-s", sample, url]
+    merged: list[list[int]] = []
+    for start, end in sorted(spans):
+        # Overlapping regions would make bcftools emit a record twice.
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    regions = ",".join(f"{chrom}:{start}-{end}" for start, end in merged)
+    cmd = ["bcftools", "view", "-r", regions, "-s", sample, url]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
     if proc.returncode != 0:
         raise SequencingDataUnavailable(
-            f"bcftools failed fetching {chrom}:{start}-{end} for {sample}: {proc.stderr.strip()}"
+            f"bcftools failed fetching {regions} for {sample}: {proc.stderr.strip()}"
         )
     return proc.stdout
 
@@ -168,7 +192,12 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
             "add it to extend real concordance testing beyond CYP2D6."
         )
     chrom, start, end = region
-    vcf_text = fetch_1000genomes_region(chrom, start, end, sample)
+    sites = GRCH37_DEFINING_SITES.get(gene)
+    if sites:
+        spans = [(pos - SITE_WINDOW, pos + SITE_WINDOW) for pos in sites]
+        vcf_text = fetch_1000genomes_regions(chrom, spans, sample)
+    else:
+        vcf_text = fetch_1000genomes_region(chrom, start, end, sample)
 
     tmp_path = Path(f"/tmp/getrm_{sample}_{gene}.vcf")
     tmp_path.write_text(vcf_text)
