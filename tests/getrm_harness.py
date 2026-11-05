@@ -128,7 +128,9 @@ def fetch_1000genomes_panel_samples() -> set[str]:
     """Fetch the real 1000 Genomes phase 3 sample panel and return the set
     of sample IDs. Raises SequencingDataUnavailable on any network failure
     -- never returns a guessed/cached list presented as live data."""
-    proc = subprocess.run(["curl", "-s", "-f", ONE_KG_PANEL_URL], capture_output=True, text=True, timeout=60)
+    proc = subprocess.run(
+        ["curl", "-s", "-f", ONE_KG_PANEL_URL], capture_output=True, text=True, timeout=60, check=False
+    )
     if proc.returncode != 0 or not proc.stdout:
         raise SequencingDataUnavailable(
             f"Could not fetch the 1000 Genomes sample panel from {ONE_KG_PANEL_URL}"
@@ -171,7 +173,7 @@ def fetch_1000genomes_regions(chrom: str, spans: list[tuple[int, int]], sample: 
             merged.append([start, end])
     regions = ",".join(f"{chrom}:{start}-{end}" for start, end in merged)
     cmd = ["bcftools", "view", "-r", regions, "-s", sample, url]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=120, check=False)
     if proc.returncode != 0:
         raise SequencingDataUnavailable(
             f"bcftools failed fetching {regions} for {sample}: {proc.stderr.strip()}"
