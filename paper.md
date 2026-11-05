@@ -132,7 +132,15 @@ aligned reads instead. Running this validation for real also surfaced
 and fixed a genuine defect in the caller itself, where homozygous-
 reference genotypes were misread as evidence of the variant allele --
 invisible against hand-authored test fixtures, but immediately apparent
-against real population data. Full per-sample results are in
+against real population data. For the chemotherapy genes, consensus
+genotypes from the CDC GeT-RM consolidated table were translated to the
+calls the allele table can make and run the same way: DPYD matched 63/64
+diplotypes, TPMT 60/60 and UGT1A1 37/41 (41/41 phenotypes). The DPYD
+mismatch is a sample both 1000 Genomes call sets show as heterozygous
+for c.2846A>T against a \*1/\*1 consensus; the UGT1A1 mismatches are
+\*36/\*37 repeat lengths that phase 3 does not represent. Carriers are
+few (5 DPYD, 7 TPMT, 28 UGT1A1), so these runs mostly confirm normal
+calls. Full per-sample results are in
 `validation/getrm_concordance_report.md`.
 
 # Availability

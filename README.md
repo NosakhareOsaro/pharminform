@@ -24,7 +24,7 @@ below).
 - [x] Directional ultrarapid-metabolizer flag
 - [x] Composite risk test suite (monotonicity, fallback)
 - [x] Face-validity case-report tests
-- [x] GeT-RM validation: live CYP2D6 concordance run completed (0/6, 0.0% -- see below; other 5 genes' consensus data not yet transcribed)
+- [x] GeT-RM validation: live concordance runs completed -- DPYD 63/64, TPMT 60/60, UGT1A1 37/41 diplotypes (41/41 phenotypes); CYP2D6 0/6 (see below; CYP2C9/CYP2C19 not yet loaded)
 - [x] Jinja2 HTML clinical report + PDF export
 - [x] CPIC truth-set pytest suite
 - [x] CLI
@@ -154,7 +154,28 @@ account-issued API key) or for running Aldy directly against aligned reads.
 
 ## GeT-RM validation
 
-A live concordance run against published GeT-RM consensus genotypes has
+**DPYD, TPMT and UGT1A1.** Consensus genotypes from the CDC GeT-RM
+consolidated table (V4, 1-22-25) were translated to the calls the
+bootstrap allele table can make, and the samples that are also in 1000
+Genomes phase 3 were run through the real pipeline:
+
+| Gene | Attempted | Diplotype match | Phenotype match |
+|---|---|---|---|
+| DPYD | 64 | 63 | 63 |
+| TPMT | 60 | 60 | 60 |
+| UGT1A1 | 41 | 37 | 41 |
+
+The one DPYD mismatch (NA07048) is a sample both 1000 Genomes call sets
+show as heterozygous for c.2846A>T while the GeT-RM consensus says
+\*1/\*1 -- the caller reports what the data contains, and the discrepancy
+is unresolved. The four UGT1A1 mismatches are \*36/\*37 repeat lengths
+that phase 3 does not represent; their phenotypes still match. Carriers
+are few (5 DPYD, 7 TPMT, 28 UGT1A1), samples with alleles outside the
+panel are excluded and counted, and this is analytical testing on public
+reference data for research use, not clinical validation. Details in
+[`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
+
+**CYP2D6.** A live concordance run against published GeT-RM consensus genotypes has
 been completed for CYP2D6, using real 1000 Genomes sequencing data (11
 consensus diplotypes transcribed from Gaedigk et al. 2019, PMID:31401124).
 Of those 11 samples, 6 are present in the 1000 Genomes phase 3 panel
@@ -250,5 +271,5 @@ Built PharmInform: clinical pharmacogenomics platform performing
 CYP2D6/CYP2C19/DPYD star allele calling (Aldy + PharmVar), CPIC/DPWG
 dosing recommendations, an original multi-gene composite risk scoring
 model, and Streamlit web demo -- published to PyPI with Bioconda recipe
-and submitted to JOSS. (GeT-RM validation harness implemented; live
-concordance run pending -- see GeT-RM validation section above.)
+and submitted to JOSS. (GeT-RM concordance runs completed for DPYD,
+TPMT, UGT1A1 and CYP2D6 -- see GeT-RM validation section above.)

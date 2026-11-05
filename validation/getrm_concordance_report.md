@@ -1,7 +1,8 @@
 # GeT-RM Concordance Report
 
-**Status: live concordance run completed for CYP2D6 against real 1000
-Genomes sequencing data.** Result: 0/6 attempted samples matched their
+**Status: live concordance runs completed for CYP2D6 (below) and for DPYD,
+TPMT and UGT1A1 (see "DPYD, TPMT and UGT1A1"), against real 1000 Genomes
+sequencing data.** CYP2D6 result: 0/6 attempted samples matched their
 published consensus diplotype (0.0% concordance). Every mismatch has a
 specific, attributable cause explained below -- this is a real,
 informative result that confirms this project's own repeated
@@ -128,20 +129,125 @@ below produced the identical, wrong `*10/*17` call. Fixed by checking
 for a non-reference, non-missing allele before treating a record as
 evidence of a defining variant.
 
-## What's needed to extend this beyond CYP2D6
+## DPYD, TPMT and UGT1A1 (live run, 5 November 2026)
 
-1. Transcribe the Pratt 2016 (PMID:26621101) consensus tables for
-   CYP2C9, CYP2C19, DPYD, TPMT, and UGT1A1 into
-   `getrm_consensus_genotypes.json`.
-2. Add each gene's GRCh37 region to `GRCH37_GENE_REGIONS` in
-   `tests/getrm_harness.py` (CYP2D6 is currently the only one
-   configured).
-3. Re-run `pytest tests/test_getrm_validation.py` -- the harness will
-   pick up the new genes automatically via the same
-   `run_concordance_check()` path exercised here.
-4. For CYP2D6 specifically, re-testing with `caller.run_aldy` against
-   real aligned reads (BAM/CRAM, e.g. 1000 Genomes' own alignments)
-   rather than the VCF-only fallback would be the clinically-relevant
-   comparison, since Aldy is copy-number-aware; that's a materially
-   larger effort (reference genome + ILP solver + multi-GB alignment
-   downloads) not undertaken in this pass.
+Code: branch `fix/cpic-phenotype-bands` (after commit 0378d4f). Data: 1000
+Genomes phase 3 GRCh37 (`v5a`, AWS mirror), fetched with `bcftools` in
+small windows around each defining variant. Consensus: CDC GeT-RM
+consolidated table V4 (1-22-25), extracted to
+`src/pharminform/data/getrm_consolidated_v4_oncology.tsv` and translated
+to the expected panel call by `tests/getrm_oncology_consensus.py`. Raw
+per-sample outcomes: `validation/getrm_oncology_live_results.json`.
+
+| Gene | Consensus calls | Out of panel scope | Not in 1000 Genomes | Attempted | Diplotype match | Phenotype match |
+|---|---|---|---|---|---|---|
+| DPYD | 167 | 25 | 78 | 64 | 63/64 (98.4%) | 63/64 |
+| TPMT | 147 | 13 | 74 | 60 | 60/60 (100.0%) | 60/60 |
+| UGT1A1 | 197 | 5 | 151 | 41 | 37/41 (90.2%) | 41/41 |
+
+"Out of panel scope" means the consensus contains an allele the bootstrap
+table cannot detect (for example DPYD c.557A>G or exon deletions, TPMT
+\*16 or \*40, tentative UGT1A1 calls); those samples are listed with the
+reason by `load_oncology_consensus()` and are not counted either way.
+
+### Every carrier and every mismatch
+
+DPYD:
+
+| Sample | Consensus (panel) | Called | Diplotype | Phenotype (consensus / called) |
+|---|---|---|---|---|
+| HG00118 | c.1236G>A(HapB3)/c.2846A>T | c.1236G>A(HapB3)/c.2846A>T | match | intermediate metabolizer / intermediate metabolizer |
+| HG00129 | c.1236G>A(HapB3)/\*1 | c.1236G>A(HapB3)/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| HG00185 | \*2A/\*1 | \*2A/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| HG00332 | \*13/\*1 | \*13/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA07048 | \*1/\*1 | c.2846A>T/\*1 | mismatch | normal metabolizer / intermediate metabolizer |
+| NA20901 | \*2A/\*1 | \*2A/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+
+TPMT:
+
+| Sample | Consensus (panel) | Called | Diplotype | Phenotype (consensus / called) |
+|---|---|---|---|---|
+| HG00133 | \*2/\*1 | \*2/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| HG00589 | \*3C/\*1 | \*3C/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| HG01083 | \*2/\*1 | \*2/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18966 | \*3C/\*1 | \*3C/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA19035 | \*3C/\*3C | \*3C/\*3C | match | poor metabolizer / poor metabolizer |
+| NA19920 | \*3C/\*1 | \*3C/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA20296 | \*3C/\*1 | \*3C/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+
+UGT1A1:
+
+| Sample | Consensus (panel) | Called | Diplotype | Phenotype (consensus / called) |
+|---|---|---|---|---|
+| HG00276 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA07056 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA07357 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA10847 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA11832 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12003 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12006 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12156 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12273 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12717 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA12813 | \*28/\*28 | \*28/\*28 | match | poor metabolizer / poor metabolizer |
+| NA12878 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18519 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18544 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18868 | \*28/\*28 | \*28/\*28 | match | poor metabolizer / poor metabolizer |
+| NA18942 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18966 | \*6/\*1 | \*6/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18973 | \*6/\*1 | \*6/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA18980 | \*6/\*6 | \*6/\*6 | match | poor metabolizer / poor metabolizer |
+| NA19007 | \*6/\*1 | \*6/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA19095 | \*28/\*36 | \*28/\*1 | mismatch | intermediate metabolizer / intermediate metabolizer |
+| NA19143 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA19147 | \*28/\*28 | \*28/\*28 | match | poor metabolizer / poor metabolizer |
+| NA19207 | \*28/\*36 | \*28/\*1 | mismatch | intermediate metabolizer / intermediate metabolizer |
+| NA19213 | \*36/\*1 | \*1/\*1 | mismatch | normal metabolizer / normal metabolizer |
+| NA19239 | \*28/\*37 | \*28/\*28 | mismatch | poor metabolizer / poor metabolizer |
+| NA19819 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+| NA19908 | \*28/\*1 | \*28/\*1 | match | intermediate metabolizer / intermediate metabolizer |
+
+### The mismatches
+
+- **NA07048, DPYD.** GeT-RM consensus \*1/\*1; called c.2846A>T/\*1
+  (intermediate). The call is what the data says: 1000 Genomes phase 3
+  has NA07048 heterozygous (`0|1`) at rs67376798, and so does the 30x
+  high-coverage release (`chr1:97082391 T>A`, `0|1`). The discrepancy is
+  between the sequence data and the consensus, not in the caller. It is
+  unresolved here: it may be that the assays behind this sample's
+  consensus did not cover c.2846A>T, but that has not been checked. Worth
+  raising with the GeT-RM team (DLSInquiries@cdc.gov) before quoting it
+  either way.
+- **UGT1A1 \*36 and \*37 (NA19095, NA19207, NA19213, NA19239).** 1000
+  Genomes phase 3 records the promoter TA repeat only as the TA7
+  insertion (rs34983651, C>CAT), so TA5 (\*36) and TA8 (\*37) never
+  reach the caller: \*36 reads as \*1 and \*37 as \*28. The phenotype is
+  unaffected in all four (\*36 and \*1 are both normal function; \*37 and
+  \*28 both decreased). A data limitation, not a caller fault; it would
+  need a callset that represents every repeat length.
+
+### Limits
+
+- Real carriers are few: 5 DPYD, 7 TPMT and 28 UGT1A1
+  consensus carriers among the attempted samples. Most matches are normal
+  calls, which is why the synthetic tests in
+  `tests/test_cpic_bands_and_alleles.py` still matter.
+- Tested on real data: DPYD \*2A, \*13, c.2846A>T and HapB3 (including
+  HG00118 with HapB3 and c.2846A>T together); TPMT \*2, \*3C
+  heterozygous and homozygous; UGT1A1 \*6, \*28 heterozygous and
+  homozygous. Not tested on real data: TPMT \*3A (no \*3A carrier in
+  scope is in 1000 Genomes), so the cis/trans logic rests on the
+  synthetic tests; UGT1A1 \*36 and \*37 (not represented in phase 3).
+- Analytical concordance on public reference data, research use only --
+  not clinical validation.
+
+## What's still needed
+
+1. Load the CYP2C9 and CYP2C19 consensus calls (the CDC consolidated
+   table has them) and run them the same way.
+2. Resolve the NA07048 DPYD discrepancy with the GeT-RM team.
+3. For CYP2D6, re-test with `caller.run_aldy` against real aligned reads
+   (BAM/CRAM) rather than the VCF-only fallback, since Aldy is
+   copy-number-aware; a materially larger effort (reference genome + ILP
+   solver + multi-GB alignment downloads) not undertaken yet.
