@@ -38,13 +38,16 @@ def assess_confidence(
     call: DiplotypeCall,
     all_gene_variants: list[VariantCall] | None = None,
     min_depth: int = DEFAULT_MIN_DEPTH,
+    dropped_variants: list[VariantCall] | None = None,
 ) -> ConfidenceResult:
     """Assess confidence in a single gene's diplotype call.
 
     ``all_gene_variants`` should be the full (pre-defining-variant-match)
     variant list for the gene, if available, so novel/unmatched variants
     can be detected -- not just the ones that happened to match a known
-    allele.
+    allele. ``dropped_variants`` are records ``load_variants`` excluded for
+    low depth or a failed FILTER; any at a defining site is reported, since
+    the call cannot see that allele.
     """
     reasons: list[str] = []
 
@@ -70,13 +73,31 @@ def assess_confidence(
         positions = ", ".join(f"{v.chrom}:{v.pos}" for v in low_depth)
         reasons.append(f"low coverage (<{min_depth}x) at defining position(s): {positions}")
 
+    known_rsids = {
+        rsid
+        for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(call.gene, {}).values()
+        for rsid in [info.get("rsid"), *info.get("alias_rsids", []), *info.get("proxy_rsids", [])]
+        if rsid
+    }
+
+    lost = [
+        v for v in dropped_variants or []
+        if v.rsid and any(r in known_rsids for r in v.rsid.split(";"))
+    ]
+    if lost:
+        positions = ", ".join(
+            f"{v.chrom}:{v.pos} ({v.rsid}, DP={v.depth}, FILTER={v.filter or 'PASS'})" for v in lost
+        )
+        reasons.append(
+            f"defining variant(s) present but excluded for low depth (<{min_depth}x) or a failed "
+            f"FILTER: {positions} -- the diplotype cannot include this allele; review before use"
+        )
+
     if all_gene_variants is not None:
-        known_rsids = {
-            info["rsid"] for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(call.gene, {}).values()
-        }
         novel = [
             v for v in all_gene_variants
-            if v.rsid not in known_rsids and v.rsid not in (None, ".")
+            if v.rsid not in (None, ".")
+            and not any(r in known_rsids for r in v.rsid.split(";"))
         ]
         unnamed = [v for v in all_gene_variants if v.rsid in (None, ".")]
         if novel:
