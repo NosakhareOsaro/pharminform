@@ -40,6 +40,7 @@ from pathlib import Path
 import cyvcf2
 
 from pharminform import caller
+from pharminform.pharmgkb_client import diplotype_to_phenotype
 
 CONSENSUS_PATH = Path(__file__).parent.parent / "src" / "pharminform" / "data" / "getrm_consensus_genotypes.json"
 
@@ -61,13 +62,20 @@ ONE_KG_PANEL_URL = (
     "integrated_call_samples_v3.20130502.ALL.panel"
 )
 
-# Approximate GRCh37 region for CYP2D6/CYP2D7 on chr22, wide enough to
-# catch the defining SNVs in caller.BOOTSTRAP_ALLELE_DEFINITIONS. GRCh37,
-# NOT GRCh38 -- 1000 Genomes phase 3 is GRCh37, unlike
-# caller.GENE_REGIONS_GRCH38. This only matters for the initial region
-# slice; the actual diplotype match is by rsID, which is build-independent.
+# Approximate GRCh37 regions, wide enough to catch the defining variants in
+# caller.BOOTSTRAP_ALLELE_DEFINITIONS (checked against Ensembl GRCh37
+# positions, including CYP2C19 *17 upstream of the gene and UGT1A1 *80 in
+# the promoter). GRCh37, NOT GRCh38 -- 1000 Genomes phase 3 is GRCh37,
+# unlike caller.GENE_REGIONS_GRCH38. This only matters for the initial
+# region slice; the actual diplotype match is by rsID, which is
+# build-independent.
 GRCH37_GENE_REGIONS = {
     "CYP2D6": ("22", 42_500_000, 42_550_000),
+    "CYP2C19": ("10", 96_515_000, 96_615_000),
+    "CYP2C9": ("10", 96_695_000, 96_750_000),
+    "DPYD": ("1", 97_540_000, 98_390_000),
+    "UGT1A1": ("2", 234_665_000, 234_682_000),
+    "TPMT": ("6", 18_125_000, 18_158_000),
 }
 
 
@@ -85,6 +93,11 @@ class ConcordanceOutcome:
     status: str  # "match", "mismatch", "skipped_no_data"
     detail: str = ""
     n_variants_considered: int = 0
+    consensus_phenotype: str | None = None
+    called_phenotype: str | None = None
+    # "match", "mismatch", or "not_assessable" when an allele in either
+    # diplotype has no function in the bootstrap table (e.g. CYP2D6 *5).
+    phenotype_status: str | None = None
 
 
 def load_consensus_table(path: Path | str = CONSENSUS_PATH) -> list[dict]:
@@ -168,7 +181,9 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
             gt_str = caller._genotype_string(rec)
             if not caller._has_alt_allele(gt_str):
                 continue
-            for alt in rec.ALT:
+            for alt_index, alt in enumerate(rec.ALT, start=1):
+                if not caller._alt_copies(gt_str, alt_index):
+                    continue
                 variants.append(
                     caller.VariantCall(
                         gene=gene, chrom=rec.CHROM, pos=rec.POS, ref=rec.REF, alt=alt,
@@ -177,6 +192,7 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
                         # integrated/imputed callset) -- depth genuinely
                         # unavailable here, not a bug.
                         genotype=gt_str, depth=None, qual=rec.QUAL, filter=rec.FILTER, rsid=rec.ID,
+                        alt_index=alt_index,
                     )
                 )
     finally:
@@ -184,6 +200,27 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
 
     call = caller.call_diplotype_from_vcf(gene, variants)
     return call, len(variants)
+
+
+def _phenotype_if_assessable(gene: str, diplotype: str) -> str | None:
+    """Phenotype for a diplotype, or None if any allele's function is not
+    in the bootstrap table -- an unknown allele would otherwise silently
+    default to normal function and make the comparison meaningless."""
+    defs = caller.BOOTSTRAP_ALLELE_DEFINITIONS.get(gene, {})
+    alleles = diplotype.split("/")
+    if len(alleles) != 2 or any(a != "*1" and a not in defs for a in alleles):
+        return None
+    functions = {name: info["function"] for name, info in defs.items()}
+    phenotype, _ = diplotype_to_phenotype(gene, diplotype, functions)
+    return phenotype
+
+
+def compare_phenotypes(gene: str, consensus: str, called: str) -> tuple[str | None, str | None, str]:
+    consensus_pheno = _phenotype_if_assessable(gene, consensus)
+    called_pheno = _phenotype_if_assessable(gene, called)
+    if consensus_pheno is None or called_pheno is None:
+        return consensus_pheno, called_pheno, "not_assessable"
+    return consensus_pheno, called_pheno, "match" if consensus_pheno == called_pheno else "mismatch"
 
 
 def run_concordance_check(samples: list[dict] | None = None) -> list[ConcordanceOutcome]:
@@ -234,13 +271,19 @@ def run_concordance_check(samples: list[dict] | None = None) -> list[Concordance
             )
             continue
 
-        status = "match" if call.diplotype == consensus else "mismatch"
+        # Compare in canonical allele order: "*4/*1" and "*1/*4" are the
+        # same diplotype.
+        same = caller.normalize_diplotype(call.diplotype) == caller.normalize_diplotype(consensus)
+        status = "match" if same else "mismatch"
+        consensus_pheno, called_pheno, pheno_status = compare_phenotypes(gene, consensus, call.diplotype)
         outcomes.append(
             ConcordanceOutcome(
                 coriell_id=coriell_id, gene=gene, consensus_diplotype=consensus,
                 called_diplotype=call.diplotype, status=status,
                 detail="" if status == "match" else "; ".join(call.ambiguous_candidates),
                 n_variants_considered=n_variants,
+                consensus_phenotype=consensus_pheno, called_phenotype=called_pheno,
+                phenotype_status=pheno_status,
             )
         )
 
@@ -252,6 +295,8 @@ def summarize(outcomes: list[ConcordanceOutcome]) -> dict:
     matches = sum(1 for o in outcomes if o.status == "match")
     mismatches = sum(1 for o in outcomes if o.status == "mismatch")
     skipped = sum(1 for o in outcomes if o.status == "skipped_no_data")
+    pheno_matches = sum(1 for o in outcomes if o.phenotype_status == "match")
+    pheno_mismatches = sum(1 for o in outcomes if o.phenotype_status == "mismatch")
     return {
         "total": total,
         "matches": matches,
@@ -260,4 +305,7 @@ def summarize(outcomes: list[ConcordanceOutcome]) -> dict:
         "concordance_pct_of_attempted": (
             round(100 * matches / (matches + mismatches), 1) if (matches + mismatches) else None
         ),
+        "phenotype_matches": pheno_matches,
+        "phenotype_mismatches": pheno_mismatches,
+        "phenotype_not_assessable": sum(1 for o in outcomes if o.phenotype_status == "not_assessable"),
     }
