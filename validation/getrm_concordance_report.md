@@ -1,8 +1,16 @@
 # GeT-RM Concordance Report
 
-**Status: live concordance runs completed for all six genes against real
-1000 Genomes sequencing data: CYP2D6 (below), DPYD, TPMT and UGT1A1, and
-CYP2C9 and CYP2C19 (sections further down).** CYP2D6 result: 0/6 attempted samples matched their
+**Status, 6 November 2026: the five genes PharmInform calls from a VCF
+(DPYD, TPMT, UGT1A1, CYP2C9, CYP2C19) have been re-run on the 1000 Genomes
+30x high-coverage panel, which covers more GeT-RM samples and carriers
+than phase 3; the phenotype rules have been checked against CPIC's own
+tables; the NA07048 DPYD discrepancy is explained; and CYP2D6 is no longer
+called from VCF input. See "30x high-coverage run and CPIC table check"
+at the end. The sections between here and there are the earlier phase 3
+runs, kept as the record.**
+
+Earlier phase 3 runs: all six genes, CYP2D6 (below), DPYD, TPMT and
+UGT1A1, and CYP2C9 and CYP2C19 (sections further down). CYP2D6 result: 0/6 attempted samples matched their
 published consensus diplotype (0.0% concordance). Every mismatch has a
 specific, attributable cause explained below -- this is a real,
 informative result that confirms this project's own repeated
@@ -214,11 +222,10 @@ UGT1A1:
   (intermediate). The call is what the data says: 1000 Genomes phase 3
   has NA07048 heterozygous (`0|1`) at rs67376798, and so does the 30x
   high-coverage release (`chr1:97082391 T>A`, `0|1`). The discrepancy is
-  between the sequence data and the consensus, not in the caller. It is
-  unresolved here: it may be that the assays behind this sample's
-  consensus did not cover c.2846A>T, but that has not been checked. Worth
-  raising with the GeT-RM team (DLSInquiries@cdc.gov) before quoting it
-  either way.
+  between the sequence data and the consensus, not in the caller.
+  **Since explained** (6 November): the consensus for this sample comes
+  from the 2016 study, whose assays did not test c.2846A>T -- see the 30x
+  section below.
 - **UGT1A1 \*36 and \*37 (NA19095, NA19207, NA19213, NA19239).** 1000
   Genomes phase 3 records the promoter TA repeat only as the TA7
   insertion (rs34983651, C>CAT), so TA5 (\*36) and TA8 (\*37) never
@@ -271,12 +278,114 @@ intermediate) and \*2/\*3 intermediate (CPIC: poor); CYP2C19 \*2/\*17 and
 allele function, not a summed score); CYP2D6 scores above 2.25 were
 "rapid", a tier CYP2D6 does not have (CPIC: ultrarapid).
 
+## 30x high-coverage run and CPIC table check (6 November 2026)
+
+### Why a second data set
+
+Phase 3 is low-coverage sequencing plus imputation, and has 2504 samples.
+The 30x high-coverage panel (NYGC; Byrska-Bishop 2022, PMID 36055201) is
+GRCh38, sequenced to 30x, and has 3202 samples -- phase 3 plus 698
+relatives, several of them GeT-RM CEPH samples. It also calls the UGT1A1
+TA repeat at every length (TA5, TA7, TA8), which phase 3 did not.
+
+The 30x VCF has no rsIDs, so `tests/getrm_harness.GRCH38_DEFINING_SITES`
+labels the defining sites by GRCh38 position and alleles, checked
+against Ensembl GRCh38 and against the 30x records themselves. Run with
+`run_concordance_check(samples, source="30x")`; one remote fetch per gene,
+then per-sample calls locally. Raw outcomes:
+`validation/getrm_30x_live_results.json`.
+
+### Results
+
+| Gene | Attempted (phase 3) | Attempted (30x) | Consensus carriers (30x) | Diplotype match | Phenotype match |
+|---|---|---|---|---|---|
+| DPYD | 64 | 94 | 7 | 94/94* | 94/94 |
+| TPMT | 60 | 87 | 9 | 87/87 | 87/87 |
+| UGT1A1 | 41 | 60 | 35 | 59/60 | 60/60 |
+| CYP2C9 | 57 | 81 | 19 | 81/81 | 81/81 |
+| CYP2C19 | 62 | 88 | 50 | 88/88 | 88/88 |
+
+\*DPYD needs a caveat. 85 of the 94 DPYD samples have a star-name
+consensus from the 2016 28-gene study (Pratt 2016, PMID 26621101), whose
+assays did not include c.2846A>T or HapB3 (neither has a star name). For
+those 85, only \*2A and \*13 are compared; c.2846A>T and HapB3 are left
+out of the comparison (`ConsensusEntry.untested_alleles`). All four
+variants are compared only for the 9 samples from the DPYD study (Gaedigk
+2024, PMID 39032822), which include all 7 DPYD carriers: HG00118 (HapB3 +
+c.2846A>T), HG00129 (HapB3), HG00185 and NA20901 (\*2A), HG00332 and
+NA12248 (\*13), NA06991 (c.2846A>T). All 7 were called correctly.
+
+**The one mismatch, NA19239, UGT1A1.** Consensus \*28/\*37, called
+\*28/\*28 (the 30x data shows the TA7 and TA8 repeats directly). The
+\*80 proxy marker is homozygous in this sample -- \*80 is in linkage
+with both \*28 and \*37 -- and the proxy copy count overrides the
+directly observed \*37. Phenotype is unaffected (both poor), but it is a
+real caller fault, recorded as an open item below.
+
+### NA07048 explained
+
+Previously reported as unresolved. NA07048's DPYD consensus (\*1/\*1) is
+a star-name call from the 2016 study, which did not test c.2846A>T, so
+the consensus says nothing about that variant. The sequence evidence that
+NA07048 carries it is now strong:
+
+- Both 1000 Genomes call sets show it heterozygous at rs67376798.
+- In the 30x panel's CEPH pedigree 1341, NA07048's mother NA07055 is also
+  heterozygous and its father NA07034 is not -- a clean Mendelian
+  transmission (NA07048 `0|1`, maternal allele).
+- NA07055 has the same star-name \*1/\*1 consensus and the same call.
+- NA06991, from the same pedigree but typed in the 2024 DPYD study, which
+  did test c.2846A>T, has a consensus of c.2846A>T/\*1.
+
+So there is no conflict to raise: the 2016 consensus did not cover the
+variant. A note to GeT-RM could still be useful, suggesting NA07048 and
+NA07055 as likely c.2846A>T carriers, but nothing here depends on it.
+
+### Phenotype rules against CPIC's full tables
+
+`tests/test_cpic_full_tables.py` checks every diplotype the panel can
+call (82) against CPIC's diplotype-to-phenotype table (CPIC API, retrieved
+6 November 2026, bundled as
+`src/pharminform/data/cpic_diplotype_phenotype_panel.tsv`): phenotype for
+all 82, and activity score where CPIC gives one. Phenotypes already
+matched; three rules were corrected:
+
+- CYP2D6 \*10 and \*41 have activity value 0.25 in CPIC, not the generic
+  0.5 for decreased function (11 activity scores were wrong, e.g. \*1/\*10
+  1.5 instead of 1.25; the phenotype happened to be the same in all 11).
+- UGT1A1 \*36 is increased function in CPIC (was normal). UGT1A1 is now
+  assigned by counting decreased alleles, as CPIC does, so \*36 cannot
+  offset \*28.
+- UGT1A1 \*80 seen without the TA repeat itself is "Indeterminate" in
+  CPIC. A \*28 inferred only from the \*80 proxy is now reported as
+  indeterminate, with no dosing guidance applied.
+
+### CYP2D6 no longer called from VCF
+
+0 of 6 matched on phase 3, and the causes are structural (\*5 deletion,
+duplications, \*36 and other CYP2D6/2D7 hybrids) or in the allele table
+(\*10's rs1065852 also lies on \*4), not fixable by adding alleles. The
+pipeline now reports CYP2D6 as "not called" from VCF input, with the
+reason, and applies no CYP2D6 phenotype. `caller.run_aldy` remains for
+aligned reads.
+
+Removing CYP2D6 exposed a guideline-lookup fault: for a two-gene drug the
+lookup took the first recommendation matching either gene, so
+amitriptyline (CYP2D6 + CYP2C19) silently assumed a CYP2D6 intermediate
+metabolizer, and azathioprine and mercaptopurine assume a NUDT15
+phenotype though NUDT15 is never called. The lookup now prefers the
+recommendation that assumes normal metabolism for an untested gene, and
+the report states it ("Assumes, not tested: CYP2D6 Normal Metabolizer").
+
 ## What's still needed
 
-1. Resolve the NA07048 DPYD discrepancy with the GeT-RM team.
-2. For CYP2D6, re-test with `caller.run_aldy` against real aligned reads
-   (BAM/CRAM) rather than the VCF-only fallback, since Aldy is
-   copy-number-aware; a materially larger effort (reference genome + ILP
-   solver + multi-GB alignment downloads) not undertaken yet.
-3. Check the phenotype model for every gene against CPIC's published
-   diplotype-to-phenotype tables, not just the cases tested so far.
+1. UGT1A1: a directly observed TA repeat should take precedence over the
+   \*80 proxy (NA19239 above).
+2. More carriers, especially DPYD (7) and TPMT (9). Public data is close
+   to exhausted for these; the next source is a lab pilot with real
+   clinical samples.
+3. CYP2D6 with Aldy on real aligned reads (BAM/CRAM), if CYP2D6 is to be
+   offered again; a materially larger effort (reference genome, ILP
+   solver, multi-GB alignments).
+4. NUDT15 is not called, so thiopurine guidance assumes a normal NUDT15;
+   adding it would remove that assumption.
