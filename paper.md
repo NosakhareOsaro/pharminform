@@ -156,7 +156,9 @@ values and the UGT1A1 \*36 function. Full per-sample results are in
 PharmInform is available under the MIT license at
 `https://github.com/NosakhareOsaro/pharminform`, with a test suite
 of over 100 tests, continuous integration, a Dockerfile, and a Bioconda
-recipe skeleton (not yet submitted -- see README). The v0.1.0 release is
-archived on Zenodo at `https://doi.org/10.5281/zenodo.21210588`.
+recipe skeleton (not yet submitted -- see README). The v0.2.0 release, which
+the results above describe, is archived on Zenodo at
+`https://doi.org/10.5281/zenodo.23992394`; all versions are at
+`https://doi.org/10.5281/zenodo.21210587`.
 
 # References

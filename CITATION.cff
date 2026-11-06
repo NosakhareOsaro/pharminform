@@ -16,10 +16,10 @@ version: 0.2.0
 date-released: "2026-11-06"
 license: MIT
 repository-code: "https://github.com/NosakhareOsaro/pharminform"
-# Real DOI, minted by Zenodo after successfully archiving the v0.1.0
-# GitHub release (confirmed resolving at https://doi.org/10.5281/zenodo.21210588).
-# Not a placeholder, so the earlier circular-dependency problem doesn't apply.
-doi: "10.5281/zenodo.21210588"
+# Zenodo concept DOI: resolves to the latest archived release. Version
+# DOIs: v0.1.0 10.5281/zenodo.21210588, v0.2.0 10.5281/zenodo.23992394
+# (both confirmed resolving, 2026-11-06).
+doi: "10.5281/zenodo.21210587"
 keywords:
   - pharmacogenomics
   - CPIC
