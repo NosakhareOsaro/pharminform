@@ -31,6 +31,14 @@ def run_pipeline(
     gene_phenotypes: dict[str, str] = {}
 
     for gene in genes:
+        if gene in caller.VCF_UNSUPPORTED_GENES:
+            gene_rows.append(
+                GeneReportRow(
+                    gene=gene, diplotype="not called", phenotype=None, calling_method="none",
+                    confidence_level="low", confidence_reasons=[caller.VCF_UNSUPPORTED_GENES[gene]],
+                )
+            )
+            continue
         gene_variants = variants_by_gene.get(gene, [])
         call = caller.call_diplotype_from_vcf(gene, gene_variants)
         conf = assess_confidence(
@@ -46,8 +54,12 @@ def run_pipeline(
             phenotype, _ = diplotype_to_phenotype(gene, call.diplotype, allele_functions)
         except ValueError:
             phenotype = None
+        if call.proxy_only_alleles:
+            # CPIC lists UGT1A1 *80 without the TA repeat itself as
+            # indeterminate; no guideline is applied to it.
+            phenotype = "indeterminate"
 
-        if phenotype:
+        if phenotype and phenotype != "indeterminate":
             gene_phenotypes[gene] = phenotype
 
         gene_rows.append(
@@ -73,6 +85,7 @@ def run_pipeline(
                     "recommendation": rec.recommendation,
                     "classification": rec.classification,
                     "citations": rec.citations,
+                    "assumed_phenotypes": rec.assumed_phenotypes,
                 }
             )
 

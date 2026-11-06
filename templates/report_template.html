@@ -48,7 +48,7 @@
   {% for r in cpic_recommendations %}
   <tr>
     <td>{{ r.drug }}</td>
-    <td>{{ r.phenotypes }}</td>
+    <td>{{ r.phenotypes }}{% if r.assumed_phenotypes %}<br><em>Assumes, not tested: {% for g, p in r.assumed_phenotypes.items() %}{{ g }} {{ p }}{% if not loop.last %}, {% endif %}{% endfor %}</em>{% endif %}</td>
     <td>{{ r.recommendation }}</td>
     <td>{{ r.classification }}</td>
     <td>{% for c in r.citations %}PMID:{{ c }} {% endfor %}</td>

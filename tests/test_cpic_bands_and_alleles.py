@@ -238,13 +238,78 @@ def test_low_depth_defining_variant_is_reported_not_silent():
 
 
 def test_pipeline_surfaces_low_depth_defining_variant():
+    # The fixture's only low-depth defining variant is CYP2D6 *4, and the
+    # pipeline no longer calls CYP2D6 from a VCF, so check the confidence
+    # step directly on what load_variants dropped.
+    from pathlib import Path
+
+    from pharminform.confidence import assess_confidence
+
+    vcf = Path(__file__).parent / "fixtures" / "synthetic_sample.vcf"
+    dropped: dict = {}
+    variants = caller.load_variants(vcf, min_depth=10, dropped=dropped)
+    call = caller.call_diplotype_from_vcf("CYP2D6", variants.get("CYP2D6", []))
+    conf = assess_confidence(call, variants.get("CYP2D6", []), min_depth=10, dropped_variants=dropped.get("CYP2D6"))
+    assert any("rs3892097" in r for r in conf.reasons)
+
+
+def test_pipeline_does_not_call_cyp2d6_from_vcf():
     from pathlib import Path
 
     from pharminform.pipeline import run_pipeline
 
     ctx = run_pipeline(Path(__file__).parent / "fixtures" / "synthetic_sample.vcf", min_depth=10)
     row = next(r for r in ctx.gene_results if r.gene == "CYP2D6")
-    assert any("rs3892097" in r for r in row.confidence_reasons)
+    assert (row.diplotype, row.phenotype, row.confidence_level) == ("not called", None, "low")
+    assert "Aldy" in row.confidence_reasons[0]
+    # Amitriptyline (CYP2D6 + CYP2C19) can still match on CYP2C19, but must
+    # say it assumes a normal CYP2D6 rather than silently picking one.
+    for rec in ctx.cpic_recommendations:
+        if "CYP2D6" in rec["phenotypes"]:
+            assert rec["assumed_phenotypes"] == {"CYP2D6": "Normal Metabolizer"}
+
+
+def test_cyp2d6_activity_values_follow_cpic():
+    # CPIC gives *10 and *41 an activity value of 0.25, not the generic 0.5.
+    functions = {"*4": "no function", "*10": "decreased function", "*41": "decreased function"}
+    assert diplotype_to_phenotype("CYP2D6", "*1/*10", functions) == ("normal metabolizer", 1.25)
+    assert diplotype_to_phenotype("CYP2D6", "*10/*41", functions) == ("intermediate metabolizer", 0.5)
+    assert diplotype_to_phenotype("CYP2D6", "*4/*10", functions) == ("intermediate metabolizer", 0.25)
+
+
+def test_ugt1a1_star36_does_not_offset_a_decreased_allele():
+    functions = {n: i["function"] for n, i in caller.BOOTSTRAP_ALLELE_DEFINITIONS["UGT1A1"].items()}
+    assert functions["*36"] == "increased function"
+    assert diplotype_to_phenotype("UGT1A1", "*28/*36", functions)[0] == "intermediate metabolizer"
+    assert diplotype_to_phenotype("UGT1A1", "*1/*36", functions)[0] == "normal metabolizer"
+    assert diplotype_to_phenotype("UGT1A1", "*36/*36", functions)[0] == "normal metabolizer"
+
+
+def test_ugt1a1_proxy_only_star28_is_indeterminate(tmp_path):
+    # CPIC lists *80 without the TA repeat itself as indeterminate.
+    from pharminform.pipeline import run_pipeline
+
+    v = caller.VariantCall(
+        gene="UGT1A1", chrom="chr2", pos=233759924, ref="C", alt="T",
+        genotype="0/1", depth=40, qual=50.0, filter="PASS", rsid="rs887829",
+    )
+    call = caller.call_diplotype_from_vcf("UGT1A1", [v])
+    assert call.proxy_only_alleles == ["*28"]
+
+    lines = [
+        "##fileformat=VCFv4.2",
+        "##contig=<ID=chr2>",
+        '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
+        '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth">',
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1",
+        "chr2\t233759924\trs887829\tC\tT\t50\tPASS\t.\tGT:DP\t0/1:40",
+    ]
+    vcf = tmp_path / "proxy.vcf"
+    vcf.write_text("\n".join(lines) + "\n")
+    ctx = run_pipeline(vcf, min_depth=10, genes=["UGT1A1"])
+    row = ctx.gene_results[0]
+    assert (row.diplotype, row.phenotype) == ("*28/*1", "indeterminate")
+    assert not ctx.cpic_recommendations
 
 
 def test_cyp2d6_duplication_is_ultrarapid_not_rapid():
