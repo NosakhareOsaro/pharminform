@@ -24,7 +24,13 @@ reason -- never guessed:
   HapB3; c.85T>C (*9A), c.496A>G, c.1601G>A (*4), c.1627A>G (*5),
   c.1896T>C and c.2194G>A (*6) are normal function in CPIC and are
   invisible to the panel (read as *1). Any other variant, deletion, or
-  ambiguous star name puts the sample out of scope.
+  ambiguous star name puts the sample out of scope. DPYD consensus calls
+  come from two studies: variant lists from the DPYD study (Gaedigk 2024,
+  PMID 39032822, 33 samples) and star names from the 28-gene study
+  (Pratt 2016, PMID 26621101), whose assays did not include c.2846A>T or
+  HapB3 -- neither has a star name. A star-name "*1/*1" therefore says
+  nothing about those two, and they are listed in ``untested_alleles`` so
+  the harness leaves them out of the comparison.
 * TPMT: in scope only when every allele is *1, *2, *3A, *3B or *3C.
 * UGT1A1: *60 (-3279T>G, not in the panel) reads as *1, and the *28 + *60
   haplotype as *28. Tentative calls in parentheses other than "(*60)", and
@@ -59,6 +65,7 @@ DPYD_ACTIONABLE = {
 }
 DPYD_PANEL_NORMAL = {"c.85T>C", "c.496A>G", "c.1601G>A", "c.1627A>G", "c.1896T>C", "c.2194G>A"}
 DPYD_NORMAL_STARS = {"*1", "*9", "*4", "(*4)"}
+DPYD_NOT_IN_STAR_CALLS = ("c.2846A>T", "c.1236G>A(HapB3)")
 
 TPMT_PANEL = {"*1", "*2", "*3A", "*3B", "*3C"}
 UGT1A1_PANEL = {"*1", "*6", "*28", "*36", "*37"}
@@ -73,6 +80,9 @@ class ConsensusEntry:
     consensus_raw: str
     consensus_diplotype: str | None  # expected panel call, None if out of scope
     scope_note: str = ""
+    # Panel alleles the consensus source did not test, so a call of one of
+    # them can neither match nor contradict it.
+    untested_alleles: tuple[str, ...] = ()
 
 
 def _diplotype(alleles: list[str]) -> str:
@@ -122,6 +132,12 @@ def translate_dpyd(raw: str) -> tuple[str | None, str]:
     if problem:
         return None, problem
     return _diplotype(found), ""
+
+
+def untested_alleles(gene: str, raw: str) -> tuple[str, ...]:
+    if gene == "DPYD" and re.fullmatch(r"[*()\d]+/[*()\d]+", raw.replace(" ", "")):
+        return DPYD_NOT_IN_STAR_CALLS
+    return ()
 
 
 def translate_tpmt(raw: str) -> tuple[str | None, str]:
@@ -182,7 +198,9 @@ def load_oncology_consensus(
                 if not raw:
                     continue
                 expected, note = translate(raw)
-                entries.append(ConsensusEntry(row["coriell_id"], gene, raw, expected, note))
+                entries.append(
+                    ConsensusEntry(row["coriell_id"], gene, raw, expected, note, untested_alleles(gene, raw))
+                )
     return entries
 
 
@@ -194,7 +212,10 @@ def in_scope_samples(entries: list[ConsensusEntry] | None = None) -> list[dict]:
     """In-scope entries in the shape getrm_harness.run_concordance_check takes."""
     entries = entries if entries is not None else load_oncology_consensus()
     return [
-        {"coriell_id": e.coriell_id, "gene": e.gene, "consensus_diplotype": e.consensus_diplotype}
+        {
+            "coriell_id": e.coriell_id, "gene": e.gene, "consensus_diplotype": e.consensus_diplotype,
+            "untested_alleles": list(e.untested_alleles),
+        }
         for e in entries
         if e.consensus_diplotype is not None
     ]
