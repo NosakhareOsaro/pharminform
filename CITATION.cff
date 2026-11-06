@@ -12,8 +12,8 @@ authors:
     # (traced directly in zenodo-rdm's source, not inferred). orcid is
     # optional in this schema, so omitting it entirely is valid; add a
     # real ORCID back in once one exists.
-version: 0.1.0
-date-released: "2026-07-05"
+version: 0.2.0
+date-released: "2026-11-06"
 license: MIT
 repository-code: "https://github.com/NosakhareOsaro/pharminform"
 # Real DOI, minted by Zenodo after successfully archiving the v0.1.0

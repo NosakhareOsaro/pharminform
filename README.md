@@ -8,8 +8,9 @@ drugs affected by more than one pharmacogene -- a gap in existing
 open-source PGx tools (see [Composite Risk Scoring](#composite-risk-scoring-experimental)
 below).
 
-**Status:** research-stage, not a clinical decision support tool. See
-[Disclaimer](#disclaimer).
+**Status:** research software, not a clinical decision support tool and
+not a medical device. Do not use its output to make prescribing
+decisions. See [Disclaimer](#disclaimer).
 
 ## Progress checklist
 
@@ -281,9 +282,10 @@ primary CPIC/DPWG/PharmVar sources.
 
 ---
 
-Built PharmInform: clinical pharmacogenomics platform performing
-CYP2D6/CYP2C19/DPYD star allele calling (Aldy + PharmVar), CPIC/DPWG
-dosing recommendations, an original multi-gene composite risk scoring
-model, and Streamlit web demo -- published to PyPI with Bioconda recipe
-and submitted to JOSS. (GeT-RM concordance runs completed for DPYD,
-TPMT, UGT1A1 and CYP2D6 -- see GeT-RM validation section above.)
+PharmInform is a research pharmacogenomics tool: rule-based star allele
+calling from VCF for CYP2C19, CYP2C9, DPYD, TPMT and UGT1A1 (CYP2D6 via
+Aldy on aligned reads only), CPIC dosing recommendations, an experimental
+multi-gene composite risk score, and a Streamlit demo. It is not yet on
+PyPI or Bioconda (a recipe skeleton is in `conda-recipe/`), and the JOSS
+paper is a draft. GeT-RM concordance results are in the GeT-RM validation
+section above.
