@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pharminform"
-version = "0.1.0"
+version = "0.2.0"
 description = "Clinical pharmacogenomics platform: star allele calling, CPIC/DPWG dosing guidance, and multi-gene composite risk scoring"
 readme = "README.md"
 license = { text = "MIT" }

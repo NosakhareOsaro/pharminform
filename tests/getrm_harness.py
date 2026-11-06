@@ -34,6 +34,7 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -92,6 +93,57 @@ GRCH37_DEFINING_SITES = {
     "CYP2C9": [96_702_047, 96_741_053],
 }
 SITE_WINDOW = 25
+
+# 1000 Genomes 30x high-coverage phased panel (NYGC; Byrska-Bishop 2022,
+# PMID 36055201), GRCh38, 3202 samples: the 2504 phase 3 samples plus 698
+# relatives, so more GeT-RM samples are covered, and each sample is
+# sequenced directly rather than at low coverage with imputation. Hosted on
+# the EBI FTP mirror; the AWS bucket has no copy of this directory.
+ONE_KG_30X_BASE_URL = (
+    "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/"
+    "working/20220422_3202_phased_SNV_INDEL_SV"
+)
+ONE_KG_30X_CHROM_FILES = {
+    str(n): f"{ONE_KG_30X_BASE_URL}/1kGP_high_coverage_Illumina.chr{n}.filtered.SNV_INDEL_SV_phased_panel.vcf.gz"
+    for n in range(1, 23)
+}
+
+# The 30x VCF has no rsIDs (IDs read "10:94781859:G:A") and the caller
+# matches by rsID, so the defining sites are labelled from this table:
+# (GRCh38 position, REF, ALT, rsID), checked against Ensembl GRCh38 and
+# against the records in the 30x VCF itself. REF/ALT of None matches any
+# indel at that position: the UGT1A1 TA repeat appears there as C>CAT
+# (TA7, *28), C>CATAT (TA8, *37) and CAT>C (TA5, *36), which the caller
+# tells apart by length.
+GRCH38_DEFINING_SITES = {
+    "DPYD": [
+        (97_450_058, "C", "T", "rs3918290"),
+        (97_515_787, "A", "C", "rs55886062"),
+        (97_082_391, "T", "A", "rs67376798"),
+        (97_573_863, "C", "T", "rs56038477"),
+        (97_579_893, "G", "C", "rs75017182"),
+    ],
+    "TPMT": [
+        (18_143_724, "C", "G", "rs1800462"),
+        (18_138_997, "C", "T", "rs1800460"),
+        (18_130_687, "T", "C", "rs1142345"),
+    ],
+    "UGT1A1": [
+        (233_760_498, "G", "A", "rs4148323"),
+        (233_760_233, None, None, "rs3064744"),
+        (233_759_924, "C", "T", "rs887829"),
+    ],
+    "CYP2C19": [
+        (94_781_859, "G", "A", "rs4244285"),
+        (94_780_653, "G", "A", "rs4986893"),
+        (94_761_900, "C", "T", "rs12248560"),
+    ],
+    "CYP2C9": [
+        (94_942_290, "C", "T", "rs1799853"),
+        (94_981_296, "A", "C", "rs1057910"),
+    ],
+}
+GRCH38_CHROMS = {"DPYD": "1", "TPMT": "6", "UGT1A1": "2", "CYP2C19": "10", "CYP2C9": "10"}
 
 
 class SequencingDataUnavailable(RuntimeError):
@@ -207,33 +259,89 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
     tmp_path = Path(f"/tmp/getrm_{sample}_{gene}.vcf")
     tmp_path.write_text(vcf_text)
     try:
-        vcf = cyvcf2.VCF(str(tmp_path))
-        variants = []
-        for rec in vcf:
-            if rec.ID is None:
-                continue
-            gt_str = caller._genotype_string(rec)
-            if not caller._has_alt_allele(gt_str):
-                continue
-            for alt_index, alt in enumerate(rec.ALT, start=1):
-                if not caller._alt_copies(gt_str, alt_index):
-                    continue
-                variants.append(
-                    caller.VariantCall(
-                        gene=gene, chrom=rec.CHROM, pos=rec.POS, ref=rec.REF, alt=alt,
-                        # 1000 Genomes phase 3's integrated call set has no
-                        # per-sample DP in FORMAT (population-level
-                        # integrated/imputed callset) -- depth genuinely
-                        # unavailable here, not a bug.
-                        genotype=gt_str, depth=None, qual=rec.QUAL, filter=rec.FILTER, rsid=rec.ID,
-                        alt_index=alt_index,
-                    )
-                )
+        variants = _variants_from_vcf(gene, tmp_path)
     finally:
         tmp_path.unlink(missing_ok=True)
 
     call = caller.call_diplotype_from_vcf(gene, variants)
     return call, len(variants)
+
+
+def _site_rsid(gene: str, pos: int, ref: str, alt: str) -> str | None:
+    for site_pos, site_ref, site_alt, rsid in GRCH38_DEFINING_SITES.get(gene, []):
+        if pos != site_pos:
+            continue
+        if site_ref is None and len(ref) != len(alt):
+            return rsid
+        if (ref, alt) == (site_ref, site_alt):
+            return rsid
+    return None
+
+
+def fetch_30x_sites(gene: str, samples: list[str]) -> str:
+    """Fetch a gene's defining sites for many samples from the 30x panel in
+    one remote call; the per-sample calls are then made locally."""
+    if not bcftools_available():
+        raise SequencingDataUnavailable("bcftools is not installed/on PATH.")
+    chrom = GRCH38_CHROMS.get(gene)
+    if chrom is None:
+        raise SequencingDataUnavailable(f"No GRCh38 defining sites configured for {gene}.")
+    regions = ",".join(f"chr{chrom}:{pos}" for pos, *_ in sorted(GRCH38_DEFINING_SITES[gene]))
+    cmd = ["bcftools", "view", "-r", regions, "-s", ",".join(samples), ONE_KG_30X_CHROM_FILES[chrom]]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=600, check=False)
+    if proc.returncode != 0:
+        raise SequencingDataUnavailable(f"bcftools failed fetching {regions}: {proc.stderr.strip()}")
+    return proc.stdout
+
+
+def call_diplotypes_from_30x(gene: str, samples: list[str]) -> dict[str, tuple[caller.DiplotypeCall, int]]:
+    """Call each sample from the 30x panel, labelling the defining sites with
+    their rsIDs (GRCH38_DEFINING_SITES) before the caller sees them."""
+    tmp_dir = Path(tempfile.mkdtemp(prefix=f"getrm30x_{gene}_"))
+    try:
+        multi = tmp_dir / "sites.vcf"
+        multi.write_text(fetch_30x_sites(gene, samples))
+        calls = {}
+        for sample in samples:
+            single = tmp_dir / f"{sample}.vcf"
+            subprocess.run(
+                ["bcftools", "view", "-s", sample, "-o", str(single), str(multi)],
+                check=True, capture_output=True, text=True,
+            )
+            variants = _variants_from_vcf(gene, single, label_sites=True)
+            calls[sample] = (caller.call_diplotype_from_vcf(gene, variants), len(variants))
+        return calls
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _variants_from_vcf(gene: str, path: Path, label_sites: bool = False) -> list[caller.VariantCall]:
+    variants = []
+    for rec in cyvcf2.VCF(str(path)):
+        if label_sites:
+            rsid = _site_rsid(gene, rec.POS, rec.REF, rec.ALT[0]) if len(rec.ALT) == 1 else None
+        else:
+            rsid = rec.ID
+        if rsid is None:
+            continue
+        gt_str = caller._genotype_string(rec)
+        if not caller._has_alt_allele(gt_str):
+            continue
+        for alt_index, alt in enumerate(rec.ALT, start=1):
+            if not caller._alt_copies(gt_str, alt_index):
+                continue
+            variants.append(
+                caller.VariantCall(
+                    gene=gene, chrom=rec.CHROM, pos=rec.POS, ref=rec.REF, alt=alt,
+                    # Neither 1000 Genomes call set has per-sample DP in
+                    # FORMAT (phase 3 is an integrated/imputed callset; the
+                    # 30x phased panel carries GT only) -- depth genuinely
+                    # unavailable here, not a bug.
+                    genotype=gt_str, depth=None, qual=rec.QUAL, filter=rec.FILTER, rsid=rsid,
+                    alt_index=alt_index,
+                )
+            )
+    return variants
 
 
 def _phenotype_if_assessable(gene: str, diplotype: str) -> str | None:
@@ -257,7 +365,23 @@ def compare_phenotypes(gene: str, consensus: str, called: str) -> tuple[str | No
     return consensus_pheno, called_pheno, "match" if consensus_pheno == called_pheno else "mismatch"
 
 
-def run_concordance_check(samples: list[dict] | None = None) -> list[ConcordanceOutcome]:
+def fetch_30x_panel_samples() -> set[str]:
+    proc = subprocess.run(
+        ["bcftools", "query", "-l", ONE_KG_30X_CHROM_FILES["10"]],
+        capture_output=True, text=True, timeout=120, check=False,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        raise SequencingDataUnavailable(f"Could not list 30x panel samples: {proc.stderr.strip()}")
+    return set(proc.stdout.split())
+
+
+def mask_untested(diplotype: str, untested: list[str] | tuple[str, ...]) -> str:
+    """Read alleles the consensus source never tested as *1, so the
+    comparison covers only what both sides looked at."""
+    return "/".join("*1" if a in untested else a for a in diplotype.split("/"))
+
+
+def run_concordance_check(samples: list[dict] | None = None, source: str = "phase3") -> list[ConcordanceOutcome]:
     """Run a real concordance check for each (sample, gene) pair in the
     consensus table against actual 1000 Genomes sequencing data.
 
@@ -265,12 +389,15 @@ def run_concordance_check(samples: list[dict] | None = None) -> list[Concordance
     tooling limitation (no bcftools, no region configured), are reported
     as "skipped_no_data" with the specific reason -- never silently
     marked as a match, and never given a fabricated diplotype.
+
+    ``source`` is "phase3" (GRCh37, per-sample fetches) or "30x" (the
+    GRCh38 high-coverage panel, fetched once per gene).
     """
     samples = samples if samples is not None else load_consensus_table()
     outcomes: list[ConcordanceOutcome] = []
 
     try:
-        panel_samples = fetch_1000genomes_panel_samples()
+        panel_samples = fetch_30x_panel_samples() if source == "30x" else fetch_1000genomes_panel_samples()
     except SequencingDataUnavailable as exc:
         return [
             ConcordanceOutcome(
@@ -281,6 +408,20 @@ def run_concordance_check(samples: list[dict] | None = None) -> list[Concordance
             for entry in samples
         ]
 
+    batch_calls: dict[tuple[str, str], tuple[caller.DiplotypeCall, int]] = {}
+    batch_errors: dict[str, str] = {}
+    if source == "30x":
+        for gene in sorted({e["gene"] for e in samples}):
+            ids = sorted({e["coriell_id"] for e in samples if e["gene"] == gene} & panel_samples)
+            if not ids:
+                continue
+            try:
+                for sample, result in call_diplotypes_from_30x(gene, ids).items():
+                    batch_calls[(sample, gene)] = result
+            except SequencingDataUnavailable as exc:
+                batch_errors[gene] = str(exc)
+    panel_name = "1000 Genomes 30x" if source == "30x" else "1000 Genomes phase 3"
+
     for entry in samples:
         coriell_id, gene, consensus = entry["coriell_id"], entry["gene"], entry["consensus_diplotype"]
 
@@ -289,13 +430,18 @@ def run_concordance_check(samples: list[dict] | None = None) -> list[Concordance
                 ConcordanceOutcome(
                     coriell_id=coriell_id, gene=gene, consensus_diplotype=consensus, called_diplotype=None,
                     status="skipped_no_data",
-                    detail="not present in the 1000 Genomes phase 3 sample panel",
+                    detail=f"not present in the {panel_name} sample panel",
                 )
             )
             continue
 
         try:
-            call, n_variants = call_diplotype_from_1000genomes(gene, coriell_id)
+            if source == "30x":
+                if gene in batch_errors:
+                    raise SequencingDataUnavailable(batch_errors[gene])
+                call, n_variants = batch_calls[(coriell_id, gene)]
+            else:
+                call, n_variants = call_diplotype_from_1000genomes(gene, coriell_id)
         except SequencingDataUnavailable as exc:
             outcomes.append(
                 ConcordanceOutcome(
@@ -305,16 +451,24 @@ def run_concordance_check(samples: list[dict] | None = None) -> list[Concordance
             )
             continue
 
+        untested = entry.get("untested_alleles") or ()
+        compared = mask_untested(call.diplotype, untested)
         # Compare in canonical allele order: "*4/*1" and "*1/*4" are the
         # same diplotype.
-        same = caller.normalize_diplotype(call.diplotype) == caller.normalize_diplotype(consensus)
+        same = caller.normalize_diplotype(compared) == caller.normalize_diplotype(consensus)
         status = "match" if same else "mismatch"
-        consensus_pheno, called_pheno, pheno_status = compare_phenotypes(gene, consensus, call.diplotype)
+        consensus_pheno, called_pheno, pheno_status = compare_phenotypes(gene, consensus, compared)
+        notes = [] if status == "match" else list(call.ambiguous_candidates)
+        if compared != call.diplotype:
+            notes.append(
+                f"called {call.diplotype}; {', '.join(a for a in untested if a in call.diplotype)} "
+                "not tested by the consensus source, so compared as *1"
+            )
         outcomes.append(
             ConcordanceOutcome(
                 coriell_id=coriell_id, gene=gene, consensus_diplotype=consensus,
                 called_diplotype=call.diplotype, status=status,
-                detail="" if status == "match" else "; ".join(call.ambiguous_candidates),
+                detail="; ".join(notes),
                 n_variants_considered=n_variants,
                 consensus_phenotype=consensus_pheno, called_phenotype=called_pheno,
                 phenotype_status=pheno_status,

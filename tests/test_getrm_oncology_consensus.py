@@ -1,5 +1,6 @@
 import hashlib
 
+from tests.getrm_harness import mask_untested
 from tests.getrm_oncology_consensus import (
     CYP2C_TSV_PATH,
     TSV_PATH,
@@ -10,6 +11,7 @@ from tests.getrm_oncology_consensus import (
     translate_dpyd,
     translate_tpmt,
     translate_ugt1a1,
+    untested_alleles,
 )
 
 
@@ -29,6 +31,19 @@ def test_dpyd_translation():
     assert translate_dpyd("exon 4 deletion/ no variants detected")[0] is None
     assert translate_dpyd("c.85T>C, c.557A>G / no variants detected")[0] is None
     assert translate_dpyd("*1/*2")[0] is None
+
+
+def test_star_name_dpyd_calls_did_not_test_c2846_or_hapb3():
+    # The 2016 28-gene study reported DPYD as star names and never tested
+    # c.2846A>T or HapB3, so its "*1/*1" cannot contradict a call of either.
+    assert untested_alleles("DPYD", "*1/*1") == ("c.2846A>T", "c.1236G>A(HapB3)")
+    assert untested_alleles("DPYD", "c.1601G>A / c.2846A>T") == ()
+    assert untested_alleles("TPMT", "*1/*1") == ()
+    entries = {e.coriell_id: e for e in load_oncology_consensus() if e.gene == "DPYD"}
+    assert entries["NA07048"].untested_alleles
+    assert not entries["NA06991"].untested_alleles
+    assert mask_untested("c.2846A>T/*1", entries["NA07048"].untested_alleles) == "*1/*1"
+    assert mask_untested("*2A/*1", entries["NA07048"].untested_alleles) == "*2A/*1"
 
 
 def test_tpmt_translation():
