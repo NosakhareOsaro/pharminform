@@ -31,6 +31,20 @@ import cyvcf2
 
 TARGET_GENES = ["CYP2D6", "CYP2C19", "DPYD", "UGT1A1", "TPMT", "CYP2C9"]
 
+# Genes the VCF-only path does not call. CYP2D6's common alleles include
+# whole-gene deletion (*5), duplications and CYP2D6/CYP2D7 hybrids (*36,
+# *13), none of which a VCF's SNV/indel records show, and *10's defining
+# variant (rs1065852) also lies on *4 -- the rule-based path matched 0 of 6
+# GeT-RM samples. A phenotype from it would look precise and be wrong, so
+# these genes are reported as not called; use run_aldy on aligned reads.
+VCF_UNSUPPORTED_GENES = {
+    "CYP2D6": (
+        "CYP2D6 is not called from VCF input: its common structural alleles "
+        "(*5 deletion, duplications, CYP2D6/2D7 hybrids) are not visible in a VCF. "
+        "Call it with Aldy from aligned reads (BAM/CRAM)."
+    ),
+}
+
 # Approximate gene regions (GRCh38), used only to subset the VCF to the
 # relevant loci before matching. Widened slightly beyond the coding sequence
 # to catch upstream/intronic defining variants (e.g. splice-site alleles).
@@ -114,7 +128,7 @@ BOOTSTRAP_ALLELE_DEFINITIONS: dict[str, dict[str, dict]] = {
             ),
         },
         "*36": {
-            "rsid": "rs3064744", "ref": "A(TA)6", "alt": "A(TA)5", "function": "normal function",
+            "rsid": "rs3064744", "ref": "A(TA)6", "alt": "A(TA)5", "function": "increased function",
             "alias_rsids": ["rs8175347"],
             "indel_length_change": -2,
         },
@@ -164,6 +178,9 @@ class DiplotypeCall:
     matched_variants: list[VariantCall] = field(default_factory=list)
     ambiguous_candidates: list[str] = field(default_factory=list)
     raw_aldy_output: str | None = None
+    # Alleles inferred only from an LD proxy (UGT1A1 *28 from *80). CPIC
+    # reports such a result as indeterminate (see pipeline.py).
+    proxy_only_alleles: list[str] = field(default_factory=list)
 
 
 def load_variants(
@@ -460,10 +477,12 @@ def call_diplotype_from_vcf(
                     seen_directly.add(name)
 
     ambiguous: list[str] = []
+    proxy_only: list[str] = []
 
     for name, info in defs.items():
         if name in copies and name not in seen_directly and info.get("proxy_note"):
             ambiguous.append(info["proxy_note"])
+            proxy_only.append(name)
 
     # Haplotypes made of other alleles in cis (TPMT *3A = *3B + *3C).
     for name, info in defs.items():
@@ -516,4 +535,5 @@ def call_diplotype_from_vcf(
         method="rule_based_vcf",
         matched_variants=variants,
         ambiguous_candidates=ambiguous,
+        proxy_only_alleles=proxy_only,
     )

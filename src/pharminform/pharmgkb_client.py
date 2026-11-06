@@ -63,7 +63,8 @@ DEFAULT_ACTIVITY_BANDS: list[tuple[float, float, str]] = [
 # allele (AS 1) is intermediate and two (AS 0) are poor. UGT1A1 is also
 # function-based (Gammal 2016, PMID 26417955; CPIC 2020 update): one
 # decreased-function allele (*1/*28, *1/*6) is intermediate and two
-# (*28/*28, *6/*28, *6/*6) are poor.
+# (*28/*28, *6/*28, *6/*6) are poor -- see _ugt1a1_phenotype, since *36
+# is increased function and a summed score would let it offset *28.
 #
 # CYP2C9 follows the CPIC activity score (Theken 2020, PMID 32189324):
 # AS 2 = normal, 1-1.5 = intermediate (so *1/*2 is intermediate), 0-0.5 =
@@ -91,11 +92,6 @@ ACTIVITY_BAND_OVERRIDES: dict[str, list[tuple[float, float, str]]] = {
         (0.0, 0.5, "poor metabolizer"),
         (0.75, 1.5, "intermediate metabolizer"),
         (1.75, 4.0, "normal metabolizer"),
-    ],
-    "UGT1A1": [
-        (0.0, 1.0, "poor metabolizer"),
-        (1.25, 1.75, "intermediate metabolizer"),
-        (2.0, 4.0, "normal metabolizer"),
     ],
 }
 
@@ -128,18 +124,30 @@ class PharmGKBClient:
         return data[0] if data else None
 
 
+# Alleles whose CPIC activity value differs from the default for their
+# function class (CPIC allele functionality table, api.cpicpgx.org):
+# CYP2D6 *10 and *41 are decreased function at 0.25, not 0.5.
+ALLELE_ACTIVITY_VALUE_OVERRIDES: dict[str, dict[str, float]] = {
+    "CYP2D6": {"*10": 0.25, "*41": 0.25},
+}
+
+
 def diplotype_activity_score(
-    diplotype: str, allele_functions: dict[str, str]
+    diplotype: str, allele_functions: dict[str, str], gene: str | None = None
 ) -> float:
     """Sum activity values for both haplotypes in a diplotype string like
     "*4/*10". Alleles not present in ``allele_functions`` (including "*1",
     which is reference/normal function by convention) default to 1.0.
     """
+    overrides = ALLELE_ACTIVITY_VALUE_OVERRIDES.get(gene or "", {})
     alleles = diplotype.split("/")
     if len(alleles) != 2:
         raise ValueError(f"Expected a diplotype like '*1/*4', got: {diplotype!r}")
     total = 0.0
     for allele in alleles:
+        if allele in overrides:
+            total += overrides[allele]
+            continue
         function = allele_functions.get(allele, "normal function" if allele == "*1" else "unknown function")
         total += ALLELE_FUNCTION_TO_ACTIVITY_VALUE.get(function, 1.0)
     return total
@@ -170,15 +178,30 @@ def _cyp2c19_phenotype(diplotype: str, allele_functions: dict[str, str]) -> str:
     return "normal metabolizer"
 
 
+def _ugt1a1_phenotype(diplotype: str, allele_functions: dict[str, str]) -> str:
+    """CPIC UGT1A1 phenotypes count decreased-function alleles (Gammal 2016,
+    PMID 26417955): none is normal, one intermediate, two poor. *36 is
+    increased function but does not offset a decreased allele (*28/*36 is
+    intermediate), so a summed score does not fit."""
+    functions = [
+        allele_functions.get(a, "normal function" if a == "*1" else "unknown function")
+        for a in diplotype.split("/")
+    ]
+    reduced = sum(f in ("decreased function", "no function") for f in functions)
+    return ["normal metabolizer", "intermediate metabolizer", "poor metabolizer"][reduced]
+
+
 def diplotype_to_phenotype(
     gene: str, diplotype: str, allele_functions: dict[str, str]
 ) -> tuple[str, float]:
     """Convert a diplotype to a CPIC-style phenotype using the activity
     score model (or, for CYP2C19, CPIC's allele-function rules). Returns
     (phenotype, activity_score)."""
-    score = diplotype_activity_score(diplotype, allele_functions)
+    score = diplotype_activity_score(diplotype, allele_functions, gene)
     if gene == "CYP2C19":
         return _cyp2c19_phenotype(diplotype, allele_functions), score
+    if gene == "UGT1A1":
+        return _ugt1a1_phenotype(diplotype, allele_functions), score
     bands = ACTIVITY_BAND_OVERRIDES.get(gene, DEFAULT_ACTIVITY_BANDS)
     for low, high, phenotype in bands:
         if low <= score <= high:
