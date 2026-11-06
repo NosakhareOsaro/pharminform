@@ -16,7 +16,9 @@ from .composite_risk import NoPathwayDataError, load_drug_pathway_weights, score
 from .confidence import assess_confidence
 from .cpic_dpwg import GuidelineLookup
 from .pharmgkb_client import diplotype_to_phenotype
+from .regimens import assess_all_regimens
 from .report import GeneReportRow, ReportContext
+from .uk_guidance import load_uk_guidance, uk_recommendations
 
 
 def run_pipeline(
@@ -39,6 +41,7 @@ def run_pipeline(
 
     gene_rows: list[GeneReportRow] = []
     gene_phenotypes: dict[str, str] = {}
+    gene_diplotypes: dict[str, str] = {}
 
     for gene in genes:
         if gene in caller.VCF_UNSUPPORTED_GENES:
@@ -76,6 +79,10 @@ def run_pipeline(
 
         if phenotype and phenotype != "indeterminate":
             gene_phenotypes[gene] = phenotype
+            # The UK layer keys DPYD off the diplotype, not the phenotype,
+            # so keep the diplotype too -- but only for a call good enough
+            # to have produced a phenotype.
+            gene_diplotypes[gene] = call.diplotype
 
         gene_rows.append(
             GeneReportRow(
@@ -104,6 +111,12 @@ def run_pipeline(
                 }
             )
 
+    uk_data = load_uk_guidance()
+    uk_recs = [r.to_dict() for r in uk_recommendations(gene_phenotypes, gene_diplotypes, uk_data)]
+    regimen_views = [
+        a.to_dict() for a in assess_all_regimens(gene_phenotypes, gene_diplotypes, uk_data)
+    ]
+
     weights_data = load_drug_pathway_weights()
     composite_results = []
     for entry in weights_data["drugs"]:
@@ -121,5 +134,7 @@ def run_pipeline(
         patient_id=patient_id,
         gene_results=gene_rows,
         cpic_recommendations=cpic_recommendations,
+        uk_recommendations=uk_recs,
+        regimens=regimen_views,
         composite_results=composite_results,
     )

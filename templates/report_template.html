@@ -65,6 +65,71 @@
   {% endif %}
 </table>
 
+<h2>UK guidance</h2>
+<p>
+  Served beside the CPIC table above, not instead of it: the UK Chemotherapy
+  Board and CERSI-PGx state starting doses directly, and they do not always
+  match CPIC. Each row names the body, edition and date it came from.
+</p>
+<table>
+  <tr><th>Drug</th><th>Gene / genotype</th><th>Starting dose</th><th>Advice</th><th>Source</th></tr>
+  {% for r in uk_recommendations %}
+  <tr>
+    <td>{{ r.drug }}</td>
+    <td>{{ r.gene }} {{ r.genotype }}<br><em>{{ r.group }}</em>{% if r.dpd_activity %}<br>DPD activity {{ r.dpd_activity }}{% endif %}</td>
+    <td>
+      {% if r.start_dose_percent is not none %}{{ r.start_dose_percent }}%{% else %}&mdash;{% endif %}
+      {% if r.max_dose_percent %}<br>up to {{ r.max_dose_percent }}%{% endif %}
+      {% if r.max_dose_percent_with_caution %}<br>({{ r.max_dose_percent_with_caution }}% with caution){% endif %}
+    </td>
+    <td>
+      {{ r.advice }}
+      {% if r.titration %}<div class="reasons">{{ r.titration }}</div>{% endif %}
+      {% if r.alternatives %}<div class="reasons">Alternatives named by the guidance: {{ r.alternatives|join(", ") }}</div>{% endif %}
+      {% if r.caveats %}<div class="reasons">{% for c in r.caveats %}&bull; {{ c }}<br>{% endfor %}</div>{% endif %}
+    </td>
+    <td>{{ r.source.issuer }} {{ r.source.version }}<br><span class="reasons">{{ r.source.date }}{% if r.source.doi %}<br>doi:{{ r.source.doi }}{% endif %}</span></td>
+  </tr>
+  {% endfor %}
+  {% if not uk_recommendations %}
+  <tr><td colspan="5">No UK guidance applies to the called genotypes.</td></tr>
+  {% endif %}
+</table>
+
+<h2>Regimen view</h2>
+<p>
+  One combination regimen, one dose decision per drug. A gene that was not
+  called is shown as a missing result, never as a normal-metaboliser result.
+</p>
+{% for a in regimens %}
+<h3>{{ a.label }}</h3>
+<table>
+  <tr><th>Drug</th><th>Gene</th><th>Decision</th></tr>
+  {% for d in a.decisions %}
+  <tr>
+    <td>{{ d.drug }}</td>
+    <td>{{ d.gene }}</td>
+    <td>
+      {% if d.status == "advice" %}
+        {% for r in d.recommendations %}{% if r.start_dose_percent is not none %}{{ r.start_dose_percent }}% starting dose{% else %}No dose given{% endif %} &mdash; {{ r.advice }} <span class="reasons">({{ r.source.issuer }} {{ r.source.version }})</span>{% if not loop.last %}<br>{% endif %}{% endfor %}
+      {% else %}
+        <strong>{{ d.status }}</strong>. {{ d.note }}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% if a.unmodified_drugs %}
+<p class="reasons">Not informed by this panel: {{ a.unmodified_drugs|join(", ") }}.</p>
+{% endif %}
+{% for n in a.notes %}
+<p class="disclaimer">{{ n }}</p>
+{% endfor %}
+{% endfor %}
+{% if not regimens %}
+<p>No regimen in the panel's scope is informed by the called genes.</p>
+{% endif %}
+
 <h2>Composite multi-gene risk (experimental)</h2>
 <p class="disclaimer">
   These scores are exploratory and are NOT CPIC/DPWG guideline output. For

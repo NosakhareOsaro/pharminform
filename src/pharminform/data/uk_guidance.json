@@ -1,0 +1,118 @@
+{
+  "_about": "UK-specific pharmacogenomic dosing guidance, encoded verbatim-in-substance from the published UK sources named in 'sources'. This file is deliberately separate from the CPIC cache: CPIC and the UK sources do not always give the same starting dose, and a UK lab or oncology pharmacy team needs the UK answer alongside the international one. Each rule carries its own source id and the guidance version, so a later edition can be added beside this one rather than silently replacing it.",
+  "schema_version": "1",
+  "sources": {
+    "ukcb_dpyd_2020": {
+      "name": "UK Chemotherapy Board: Personalised medicine approach for fluoropyrimidine-based therapies",
+      "issuer": "UK Chemotherapy Board",
+      "version": "2020",
+      "date": "2020-11",
+      "url": "https://www.ukchemotherapyboard.org/publications",
+      "scope": "Adults starting fluoropyrimidine (5-fluorouracil, capecitabine, tegafur) chemotherapy in the UK.",
+      "notes": "Dose percentages are of the standard full dose for the regimen. A later edition of this guidance exists; it is not encoded here, and its recommendations may differ."
+    },
+    "cersi_ugt1a1_2026": {
+      "name": "CERSI-PGx guideline for UGT1A1 genotype-guided irinotecan dosing",
+      "issuer": "CERSI-PGx (UK consensus guideline)",
+      "version": "2026",
+      "date": "2026-07-02",
+      "doi": "10.1002/bcp.70659",
+      "pmid": "42389808",
+      "licence": "CC BY",
+      "scope": "Adults with an epithelial malignancy starting non-pegylated irinotecan, where UGT1A1 testing is available.",
+      "notes": "No recommendation is made for rare malignancies such as sarcomas. Irinotecan formulations are not interchangeable: the evidence base is non-pegylated irinotecan, and liposomal irinotecan is not covered."
+    }
+  },
+  "dpyd": {
+    "source": "ukcb_dpyd_2020",
+    "drugs": ["fluorouracil", "capecitabine", "tegafur"],
+    "titration": {
+      "increment_percent": 12.5,
+      "max_increments": 2,
+      "per": "cycle",
+      "text": "Where a reduced starting dose is tolerated, escalate in increments of 12.5% of the full dose per cycle, to a maximum of two increments, guided by toxicity."
+    },
+    "combination_rule": "Where more than one DPYD variant is present, the loss of DPD activity is additive; use the genotype group in group_table that matches the combined genotype.",
+    "variant_activity": {
+      "*2A": "no function",
+      "*13": "no function",
+      "c.2846A>T": "decreased function",
+      "c.1236G>A(HapB3)": "decreased function"
+    },
+    "groups": [
+      {
+        "id": "normal",
+        "label": "No actionable DPYD variant detected",
+        "match": {"no_function": 0, "decreased_function": 0},
+        "dpd_activity": "100%",
+        "start_dose_percent": 100,
+        "advice": "Standard starting dose. Note that absence of these four variants does not exclude DPD deficiency from other causes.",
+        "titration": false,
+        "alternatives": []
+      },
+      {
+        "id": "het_no_function",
+        "label": "Heterozygous *2A or *13",
+        "match": {"no_function": 1, "decreased_function": 0},
+        "dpd_activity": "50%",
+        "start_dose_percent": 50,
+        "max_dose_percent": 75,
+        "advice": "Reduce the starting dose to 50% of the full dose, or use an alternative agent. If 50% is tolerated, escalate towards 75%.",
+        "titration": true,
+        "alternatives": []
+      },
+      {
+        "id": "het_decreased_function",
+        "label": "Heterozygous c.2846A>T or c.1236G>A (HapB3)",
+        "match": {"no_function": 0, "decreased_function": 1},
+        "dpd_activity": "50-75%",
+        "start_dose_percent": 50,
+        "max_dose_percent": 75,
+        "max_dose_percent_with_caution": 85,
+        "advice": "Reduce the starting dose to 50% of the full dose. If tolerated, escalate towards 75%, and to a maximum of 85% with caution.",
+        "titration": true,
+        "alternatives": []
+      },
+      {
+        "id": "two_variants",
+        "label": "Compound heterozygous or homozygous for actionable DPYD variants",
+        "match": {"total_variant_alleles": 2},
+        "dpd_activity": "0-50%, depending on the combination",
+        "start_dose_percent": null,
+        "advice": "Residual DPD activity is between 0% and 50% depending on the combination. A fluoropyrimidine should be avoided, or used only at a markedly reduced dose with specialist input and therapeutic monitoring. Discuss an alternative agent.",
+        "titration": false,
+        "alternatives": ["raltitrexed", "trifluridine/tipiracil"]
+      }
+    ]
+  },
+  "ugt1a1": {
+    "source": "cersi_ugt1a1_2026",
+    "drugs": ["irinotecan"],
+    "testing": "Test UGT1A1 before starting irinotecan for an epithelial malignancy, where testing is available.",
+    "phenotypes": {
+      "poor metabolizer": {
+        "label": "UGT1A1 poor metaboliser",
+        "example_diplotypes": ["*6/*6", "*28/*28", "*6/*28", "*28/*37"],
+        "start_dose_percent": 70,
+        "advice": "Reduce the cycle 1 irinotecan dose by 30%, for all indications. Thereafter titrate the dose on tolerability and neutrophil counts.",
+        "snomed": "738536002"
+      },
+      "intermediate metabolizer": {
+        "label": "UGT1A1 intermediate metaboliser",
+        "start_dose_percent": 100,
+        "advice": "No dose reduction is recommended. The gene-drug interaction is recognised, but the evidence does not support a reduced starting dose for intermediate metabolisers.",
+        "snomed": "738537006"
+      },
+      "normal metabolizer": {
+        "label": "UGT1A1 normal metaboliser",
+        "start_dose_percent": 100,
+        "advice": "Standard starting dose.",
+        "snomed": "738538001"
+      }
+    },
+    "allele_notes": {
+      "*36": "Dosed as wild type."
+    },
+    "combined_regimen_note": "For regimens containing both a fluoropyrimidine and irinotecan, wait for both the UGT1A1 and the DPYD result before prescribing."
+  }
+}

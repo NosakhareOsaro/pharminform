@@ -51,6 +51,10 @@ class ReportContext:
     cpic_recommendations: list[dict]
     composite_results: list[dict]
     patient_id: str | None = None
+    # UK guidance (UK Chemotherapy Board, CERSI-PGx) served beside CPIC
+    # rather than instead of it, plus the regimen-level view built from it.
+    uk_recommendations: list[dict] = field(default_factory=list)
+    regimens: list[dict] = field(default_factory=list)
     generated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     version: str = __version__
 
@@ -71,6 +75,8 @@ class ReportContext:
                 for g in self.gene_results
             ],
             "cpic_recommendations": self.cpic_recommendations,
+            "uk_recommendations": self.uk_recommendations,
+            "regimens": self.regimens,
             "composite_risk": self.composite_results,
         }
 
@@ -90,6 +96,8 @@ def render_html(context: ReportContext, template_name: str = "report_template.ht
         version=context.version,
         gene_results=context.gene_results,
         cpic_recommendations=context.cpic_recommendations,
+        uk_recommendations=context.uk_recommendations,
+        regimens=context.regimens,
         composite_results=context.composite_results,
     )
 

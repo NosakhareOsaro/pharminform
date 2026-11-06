@@ -63,11 +63,17 @@ decisions. See [Disclaimer](#disclaimer).
 │ per-gene CPIC       │                  │ multi-gene composite     │
 │ dosing recs         │                  │ risk score (experimental)│
 └──────────┬─────────┘                  └────────────┬─────────────┘
+           ↓                                          │
+┌───────────────────┐                                 │
+│ uk_guidance.py     │→ UK Chemotherapy Board (DPYD),  │
+│ regimens.py        │  CERSI-PGx (UGT1A1), per drug   │
+└──────────┬─────────┘  within a named regimen         │
            └───────────────────┬───────────────────────┘
                                 ↓
                      ┌────────────────────┐
                      │ report.py           │→ HTML / PDF clinical report
-                     │ pipeline.py          │
+                     │ pipeline.py          │  + FHIR R4 Bundle
+                     │ fhir_export.py       │    (fhir_export.py)
                      └──────────┬───────────┘
                                 ↓
               ┌─────────────────┼─────────────────┐
@@ -128,11 +134,23 @@ Input requirements, checked on load:
   **indeterminate**, not normal. Defining sites with no record at all are
   listed in the confidence reasons.
 
+Regimen view and structured output:
+
+```bash
+# Per-drug decisions for one combination regimen
+pharminform report --vcf sample.vcf --out report.html --regimen FOLFIRI
+
+# FHIR R4 Bundle (HL7 Genomics Reporting IG)
+pharminform report --vcf sample.vcf --out report.html \
+  --fhir report.fhir.json --fhir-patient-reference Patient/abc
+```
+
 ### FastAPI
 
 ```bash
 uvicorn pharminform.api:app --reload
 curl -X POST http://localhost:8000/report -F "vcf=@sample.vcf" -F "min_depth=20"
+curl -X POST http://localhost:8000/report/fhir -F "vcf=@sample.vcf"
 ```
 
 ### Streamlit demo
@@ -224,6 +242,51 @@ involved, the report states the phenotype the recommendation assumes.
 Full per-sample breakdown, panel-coverage table, and next steps (the
 other five genes' consensus data, and a same-style Aldy/BAM comparison)
 in [`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
+
+## UK guidance layer
+
+CPIC is an international consortium. UK labs and oncology pharmacy teams
+work to UK documents, and the two do not always state the same starting
+dose. `uk_guidance.py` serves the UK rule **beside** the CPIC rule rather
+than in place of it, and every recommendation carries its issuer, edition
+and date so a reader can see which body said what. Two sources are encoded
+in `src/pharminform/data/uk_guidance.json`:
+
+| Source | Scope | What is encoded |
+| --- | --- | --- |
+| UK Chemotherapy Board, 2020 | DPYD and fluoropyrimidines (5-FU, capecitabine, tegafur) | The genotype groups and their dose percentages: heterozygous \*2A or \*13 → 50% start, escalate towards 75%; heterozygous c.2846A>T or HapB3 → 50% start, towards 75% and at most 85% with caution; two variant alleles → avoid, with raltitrexed or trifluridine/tipiracil named as alternatives. Escalation is 12.5% of the full dose per cycle, at most two increments. Loss of activity is additive. |
+| CERSI-PGx, 2026 (doi:10.1002/bcp.70659) | UGT1A1 and non-pegylated irinotecan, epithelial malignancy | Poor metabolisers → 30% cycle-1 reduction, then titrate on tolerability and neutrophil counts. Intermediate metabolisers → no dose reduction. \*36 dosed as wild type. SNOMED-CT finding codes for the three phenotypes. |
+
+Only what those texts state is encoded. A DPYD allele the UK document does
+not table (for example \*9A) returns no UK advice rather than a guessed
+dose, and a later edition of either guidance should be added as a new
+source id beside these rather than edited into them. A 2024 update to the
+UK Chemotherapy Board guidance exists and is **not** encoded here.
+
+### Regimen view
+
+`regimens.py` groups those per-drug decisions under the regimen a patient
+is actually prescribed — FOLFIRI, CAPIRI/XELIRI, FOLFOXIRI, FOLFIRINOX,
+FOLFOX, CAPOX, single-agent irinotecan. A FOLFIRI assessment returns two
+separate decisions, the fluoropyrimidine dose from DPYD and the irinotecan
+dose from UGT1A1, names the drugs in the regimen that no panel gene informs
+(folinic acid, oxaliplatin), and carries CERSI-PGx's instruction to wait
+for **both** results before prescribing. A gene that was not called is
+reported as a missing result; it is never scored as normal.
+
+### FHIR output
+
+`fhir_export.py` emits the report as a FHIR R4 Bundle following the HL7
+Genomics Reporting IG (STU3): a `genomic-report` DiagnosticReport, one
+`genotype` Observation per gene, and one `therapeutic-implication`
+Observation per recommendation, `derivedFrom` the genotype it rests on and
+labelled with its source. UGT1A1 phenotypes carry the SNOMED-CT finding
+codes CERSI-PGx asks for. Two limitations are stated in the bundle itself:
+the output has not been run through the IG's own validator, and the
+metabolizer phenotype's LOINC code (53040-2) is listed by some mirrors as
+retained for historical use, so the SNOMED coding is the one a UK consumer
+should prefer. Without `--fhir-patient-reference` the bundle contains no
+patient data at all.
 
 ## Composite Risk Scoring (Experimental)
 
