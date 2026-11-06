@@ -8,8 +8,9 @@ drugs affected by more than one pharmacogene -- a gap in existing
 open-source PGx tools (see [Composite Risk Scoring](#composite-risk-scoring-experimental)
 below).
 
-**Status:** research-stage, not a clinical decision support tool. See
-[Disclaimer](#disclaimer).
+**Status:** research software, not a clinical decision support tool and
+not a medical device. Do not use its output to make prescribing
+decisions. See [Disclaimer](#disclaimer).
 
 ## Progress checklist
 
@@ -24,7 +25,7 @@ below).
 - [x] Directional ultrarapid-metabolizer flag
 - [x] Composite risk test suite (monotonicity, fallback)
 - [x] Face-validity case-report tests
-- [x] GeT-RM validation: live concordance runs completed -- DPYD 63/64, TPMT 60/60, UGT1A1 37/41 diplotypes (41/41 phenotypes), CYP2C9 57/57, CYP2C19 62/62; CYP2D6 0/6 (see below)
+- [x] GeT-RM validation on the 1000 Genomes 30x panel -- DPYD 94/94, TPMT 87/87, UGT1A1 59/60 diplotypes (60/60 phenotypes), CYP2C9 81/81, CYP2C19 88/88; phenotype rules checked against CPIC's tables for all 82 callable diplotypes; CYP2D6 not called from VCF (0/6 on phase 3; see below)
 - [x] Jinja2 HTML clinical report + PDF export
 - [x] CPIC truth-set pytest suite
 - [x] CLI
@@ -139,7 +140,7 @@ docker run -p 8501:8501 pharminform streamlit run streamlit_app/app.py --server.
 
 | Gene    | Star allele source (this project)                             | Structural variation?                                                                   |
 | ------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| CYP2D6  | Aldy (BAM/CRAM) preferred; simplified rule-based VCF fallback | Yes -- deletions/duplications/hybrids; VCF-only calls are always flagged low-confidence |
+| CYP2D6  | Aldy (BAM/CRAM) only; not called from VCF input               | Yes -- deletions/duplications/hybrids, which a VCF cannot show                          |
 | CYP2C19 | Aldy or rule-based VCF                                        | No                                                                                      |
 | CYP2C9  | Aldy or rule-based VCF                                        | No                                                                                      |
 | DPYD    | Aldy or rule-based VCF                                        | No                                                                                      |
@@ -156,31 +157,35 @@ account-issued API key) or for running Aldy directly against aligned reads.
 
 **DPYD, TPMT, UGT1A1, CYP2C9 and CYP2C19.** Consensus genotypes from the CDC GeT-RM
 consolidated table (V4, 1-22-25) were translated to the calls the
-bootstrap allele table can make, and the samples that are also in 1000
-Genomes phase 3 were run through the real pipeline:
+bootstrap allele table can make, and the samples that are also in the
+1000 Genomes 30x high-coverage panel (GRCh38, 3202 samples) were run
+through the real pipeline:
 
-| Gene | Attempted | Diplotype match | Phenotype match |
-|---|---|---|---|
-| DPYD | 64 | 63 | 63 |
-| TPMT | 60 | 60 | 60 |
-| UGT1A1 | 41 | 37 | 41 |
-| CYP2C9 | 57 | 57 | 57 |
-| CYP2C19 | 62 | 62 | 62 |
+| Gene | Attempted | Consensus carriers | Diplotype match | Phenotype match |
+|---|---|---|---|---|
+| DPYD | 94 | 7 | 94\* | 94 |
+| TPMT | 87 | 9 | 87 | 87 |
+| UGT1A1 | 60 | 35 | 59 | 60 |
+| CYP2C9 | 81 | 19 | 81 | 81 |
+| CYP2C19 | 88 | 50 | 88 | 88 |
 
-The one DPYD mismatch (NA07048) is a sample both 1000 Genomes call sets
-show as heterozygous for c.2846A>T while the GeT-RM consensus says
-\*1/\*1 -- the caller reports what the data contains, and the discrepancy
-is unresolved. The four UGT1A1 mismatches are \*36/\*37 repeat lengths
-that phase 3 does not represent; their phenotypes still match. Carriers
-are few (5 DPYD, 7 TPMT, 28 UGT1A1, 10 CYP2C9, 33 CYP2C19), samples with alleles outside the
-panel are excluded and counted, and this is analytical testing on public
-reference data for research use, not clinical validation. The phenotype
-column uses PharmInform's own model on both sides, so it does not test the
-model itself; that is covered by the CPIC cases in
-`tests/test_cpic_bands_and_alleles.py`. Details in
+\*85 of the 94 DPYD consensus calls come from a 2016 study that did not
+test c.2846A>T or HapB3, so for those only \*2A and \*13 are compared; all
+four variants are compared for the other 9, which include all 7 carriers.
+This also explains the earlier NA07048 discrepancy: its \*1/\*1 consensus
+never covered c.2846A>T, and the 30x pedigree shows the variant
+inherited from its mother. The UGT1A1 mismatch (NA19239, \*28/\*37 called
+\*28/\*28) is a caller fault -- the \*80 proxy overrides a directly seen
+\*37 -- with the same phenotype. Most attempted samples are still normal
+results, and this is analytical testing on public reference data for
+research use, not clinical validation.
+
+The phenotype column uses PharmInform's own model on both sides, so it
+does not test the model; `tests/test_cpic_full_tables.py` does, checking
+all 82 diplotypes the panel can call against CPIC's own table. Details in
 [`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
 
-**CYP2D6.** A live concordance run against published GeT-RM consensus genotypes has
+**CYP2D6 (no longer called from VCF input).** A live concordance run against published GeT-RM consensus genotypes has
 been completed for CYP2D6, using real 1000 Genomes sequencing data (11
 consensus diplotypes transcribed from Gaedigk et al. 2019, PMID:31401124).
 Of those 11 samples, 6 are present in the 1000 Genomes phase 3 panel
@@ -198,6 +203,11 @@ cannot represent -- exactly the limitation this project has documented
 throughout as requiring Aldy against aligned reads instead. Running this
 for real also surfaced and fixed a genuine bug in `caller.py` (homozygous-
 reference genotypes were being misread as evidence of the variant allele).
+Because the causes are structural, the pipeline now reports CYP2D6 as "not
+called" from VCF input rather than giving a phenotype that looks precise
+and is wrong; use `caller.run_aldy` on aligned reads. Where a two-gene
+guideline (amitriptyline) or an uncalled gene (NUDT15 for thiopurines) is
+involved, the report states the phenotype the recommendation assumes.
 Full per-sample breakdown, panel-coverage table, and next steps (the
 other five genes' consensus data, and a same-style Aldy/BAM comparison)
 in [`validation/getrm_concordance_report.md`](validation/getrm_concordance_report.md).
@@ -272,9 +282,10 @@ primary CPIC/DPWG/PharmVar sources.
 
 ---
 
-Built PharmInform: clinical pharmacogenomics platform performing
-CYP2D6/CYP2C19/DPYD star allele calling (Aldy + PharmVar), CPIC/DPWG
-dosing recommendations, an original multi-gene composite risk scoring
-model, and Streamlit web demo -- published to PyPI with Bioconda recipe
-and submitted to JOSS. (GeT-RM concordance runs completed for DPYD,
-TPMT, UGT1A1 and CYP2D6 -- see GeT-RM validation section above.)
+PharmInform is a research pharmacogenomics tool: rule-based star allele
+calling from VCF for CYP2C19, CYP2C9, DPYD, TPMT and UGT1A1 (CYP2D6 via
+Aldy on aligned reads only), CPIC dosing recommendations, an experimental
+multi-gene composite risk score, and a Streamlit demo. It is not yet on
+PyPI or Bioconda (a recipe skeleton is in `conda-recipe/`), and the JOSS
+paper is a draft. GeT-RM concordance results are in the GeT-RM validation
+section above.

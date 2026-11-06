@@ -41,7 +41,7 @@ the rest of the pipeline uses by default.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import requests
@@ -61,6 +61,9 @@ class GuidelineRecommendation:
     cpic_level: str | None
     citations: list[str]
     source: str = "CPIC"
+    # Phenotypes the chosen recommendation assumes for genes the patient
+    # was not tested for (e.g. NUDT15, or CYP2D6 from VCF input).
+    assumed_phenotypes: dict[str, str] = field(default_factory=dict)
 
 
 class CPICClient:
@@ -123,13 +126,21 @@ class GuidelineLookup:
         # lowercase, e.g. from pharmgkb_client.diplotype_to_phenotype).
         wanted = {g: p.lower() for g, p in phenotypes.items() if g in entry["genes"]}
 
+        # A multi-gene recommendation also fixes a phenotype for any gene
+        # that was not called. Among equally good matches, prefer the one
+        # that assumes normal metabolism for those genes, rather than
+        # whichever comes first in the cache, and report the assumption.
         best_match = None
-        best_score = -1
+        best_key = (0, -1)
         for rec in entry["recommendations"]:
             rec_phenotypes = {g: p.lower() for g, p in rec["phenotypes"].items()}
             score = sum(1 for g, p in wanted.items() if rec_phenotypes.get(g) == p)
-            if score > best_score and score > 0:
-                best_score = score
+            normal_assumed = sum(
+                1 for g, p in rec_phenotypes.items() if g not in wanted and p == "normal metabolizer"
+            )
+            key = (score, normal_assumed)
+            if score > 0 and key > best_key:
+                best_key = key
                 best_match = rec
 
         if best_match is None:
@@ -152,6 +163,7 @@ class GuidelineLookup:
             comments=best_match.get("comments", ""),
             cpic_level=cpic_level,
             citations=citations,
+            assumed_phenotypes={g: p for g, p in best_match["phenotypes"].items() if g not in wanted},
         )
 
     def available_drugs(self) -> list[str]:

@@ -132,16 +132,23 @@ aligned reads instead. Running this validation for real also surfaced
 and fixed a genuine defect in the caller itself, where homozygous-
 reference genotypes were misread as evidence of the variant allele --
 invisible against hand-authored test fixtures, but immediately apparent
-against real population data. For the chemotherapy genes, consensus
-genotypes from the CDC GeT-RM consolidated table were translated to the
-calls the allele table can make and run the same way: DPYD matched 63/64
-diplotypes, TPMT 60/60, UGT1A1 37/41 (41/41 phenotypes), CYP2C9
-57/57 and CYP2C19 62/62. The DPYD
-mismatch is a sample both 1000 Genomes call sets show as heterozygous
-for c.2846A>T against a \*1/\*1 consensus; the UGT1A1 mismatches are
-\*36/\*37 repeat lengths that phase 3 does not represent. Carriers are
-few (5 DPYD, 7 TPMT, 28 UGT1A1, 10 CYP2C9, 33 CYP2C19), so these runs mostly confirm normal
-calls. Full per-sample results are in
+against real population data. Because the CYP2D6 causes are structural,
+CYP2D6 is no longer called from VCF input. For the
+other five genes, consensus genotypes from the CDC GeT-RM consolidated
+table were translated to the calls the allele table can make and run
+against the 1000 Genomes 30x high-coverage panel
+[@byrskabishop2022highcoverage]: DPYD matched 94/94 diplotypes, TPMT
+87/87, UGT1A1 59/60 (60/60 phenotypes), CYP2C9 81/81 and CYP2C19 88/88.
+Most DPYD consensus calls come from the 2016 study [@pratt2016getrm],
+which did not test c.2846A>T or HapB3, so all four DPYD variants are
+compared only for the 9 samples from the DPYD study
+[@gaedigk2024dpydgetrm], including all 7 carriers. The UGT1A1 mismatch is
+a \*28/\*37 sample called \*28/\*28 because the \*80 proxy overrides the
+directly observed \*37. Carriers remain few (7 DPYD, 9 TPMT, 35 UGT1A1,
+19 CYP2C9, 50 CYP2C19). Separately, the phenotype model was checked
+against CPIC's diplotype-to-phenotype tables for all 82 diplotypes the
+allele table can call, which corrected the CYP2D6 \*10 and \*41 activity
+values and the UGT1A1 \*36 function. Full per-sample results are in
 `validation/getrm_concordance_report.md`.
 
 # Availability
