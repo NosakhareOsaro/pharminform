@@ -115,6 +115,19 @@ optional extra: `pip install -e ".[aldy]"`. It also needs an ILP solver
 pharminform report --vcf sample.vcf --out report.html --pdf report.pdf --min-depth 20
 ```
 
+Input requirements, checked on load:
+
+- **GRCh38.** A VCF whose header shows GRCh37 is refused; lift it over
+  first. If the header does not say, GRCh38 is assumed and every row says so.
+- **One sample**, or name it with `--sample` (API: `sample=`). A sites-only
+  VCF is refused.
+- **rsIDs are optional.** Defining variants are matched by rsID, or by
+  GRCh38 position and allele when the ID column is empty.
+- A defining site with no genotype call (`./.`), or a defining variant
+  dropped for depth or FILTER, makes that gene's phenotype
+  **indeterminate**, not normal. Defining sites with no record at all are
+  listed in the confidence reasons.
+
 ### FastAPI
 
 ```bash

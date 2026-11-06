@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from pharminform.caller import VCFIngestError
 from pharminform.pipeline import run_pipeline
 from pharminform.report import PDFExportUnavailable, render_pdf
 
@@ -24,6 +25,7 @@ with st.sidebar:
     st.header("Input")
     uploaded = st.file_uploader("VCF file", type=["vcf"])
     patient_id = st.text_input("Patient/sample label (optional)")
+    sample = st.text_input("Sample column (needed for multi-sample VCFs)")
     min_depth = st.slider("Minimum read depth", min_value=1, max_value=100, value=20)
     run_clicked = st.button("Run PharmInform", type="primary", disabled=uploaded is None)
 
@@ -40,9 +42,16 @@ if run_clicked and uploaded is not None:
         tmp.write(uploaded.getvalue())
         tmp_path = tmp.name
 
-    with st.spinner("Calling star alleles and scoring..."):
-        context = run_pipeline(tmp_path, min_depth=min_depth, patient_id=patient_id or None)
-    Path(tmp_path).unlink(missing_ok=True)
+    try:
+        with st.spinner("Calling star alleles and scoring..."):
+            context = run_pipeline(
+                tmp_path, min_depth=min_depth, patient_id=patient_id or None, sample=sample or None
+            )
+    except VCFIngestError as exc:
+        st.error(str(exc))
+        st.stop()
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
 
     st.header("Star allele calls and phenotypes")
     gene_df = pd.DataFrame(

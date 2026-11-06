@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import cyvcf2
+
 from . import caller
 from .composite_risk import NoPathwayDataError, load_drug_pathway_weights, score_drug
 from .confidence import assess_confidence
@@ -22,10 +24,18 @@ def run_pipeline(
     min_depth: int = 20,
     patient_id: str | None = None,
     genes: list[str] | None = None,
+    sample: str | None = None,
 ) -> ReportContext:
     genes = genes or caller.TARGET_GENES
     dropped_by_gene: dict[str, list[caller.VariantCall]] = {}
-    variants_by_gene = caller.load_variants(vcf_path, genes=genes, min_depth=min_depth, dropped=dropped_by_gene)
+    site_status: dict[str, dict[str, str]] = {}
+    variants_by_gene = caller.load_variants(
+        vcf_path, genes=genes, min_depth=min_depth, dropped=dropped_by_gene,
+        sample=sample, site_status=site_status,
+    )
+    build_note = None
+    if caller.detect_reference_build(cyvcf2.VCF(str(vcf_path))) is None:
+        build_note = "reference build not stated in the VCF header; assumed GRCh38"
 
     gene_rows: list[GeneReportRow] = []
     gene_phenotypes: dict[str, str] = {}
@@ -43,8 +53,11 @@ def run_pipeline(
         call = caller.call_diplotype_from_vcf(gene, gene_variants)
         conf = assess_confidence(
             call, all_gene_variants=gene_variants, min_depth=min_depth,
-            dropped_variants=dropped_by_gene.get(gene),
+            dropped_variants=dropped_by_gene.get(gene), site_status=site_status.get(gene),
         )
+        if build_note:
+            conf.reasons.append(build_note)
+            conf.level = "low"
 
         allele_functions = {
             name: info["function"]
@@ -57,6 +70,8 @@ def run_pipeline(
         if call.proxy_only_alleles:
             # CPIC lists UGT1A1 *80 without the TA repeat itself as
             # indeterminate; no guideline is applied to it.
+            phenotype = "indeterminate"
+        if conf.phenotype_blocked:
             phenotype = "indeterminate"
 
         if phenotype and phenotype != "indeterminate":

@@ -108,41 +108,10 @@ ONE_KG_30X_CHROM_FILES = {
     for n in range(1, 23)
 }
 
-# The 30x VCF has no rsIDs (IDs read "10:94781859:G:A") and the caller
-# matches by rsID, so the defining sites are labelled from this table:
-# (GRCh38 position, REF, ALT, rsID), checked against Ensembl GRCh38 and
-# against the records in the 30x VCF itself. REF/ALT of None matches any
-# indel at that position: the UGT1A1 TA repeat appears there as C>CAT
-# (TA7, *28), C>CATAT (TA8, *37) and CAT>C (TA5, *36), which the caller
-# tells apart by length.
-GRCH38_DEFINING_SITES = {
-    "DPYD": [
-        (97_450_058, "C", "T", "rs3918290"),
-        (97_515_787, "A", "C", "rs55886062"),
-        (97_082_391, "T", "A", "rs67376798"),
-        (97_573_863, "C", "T", "rs56038477"),
-        (97_579_893, "G", "C", "rs75017182"),
-    ],
-    "TPMT": [
-        (18_143_724, "C", "G", "rs1800462"),
-        (18_138_997, "C", "T", "rs1800460"),
-        (18_130_687, "T", "C", "rs1142345"),
-    ],
-    "UGT1A1": [
-        (233_760_498, "G", "A", "rs4148323"),
-        (233_760_233, None, None, "rs3064744"),
-        (233_759_924, "C", "T", "rs887829"),
-    ],
-    "CYP2C19": [
-        (94_781_859, "G", "A", "rs4244285"),
-        (94_780_653, "G", "A", "rs4986893"),
-        (94_761_900, "C", "T", "rs12248560"),
-    ],
-    "CYP2C9": [
-        (94_942_290, "C", "T", "rs1799853"),
-        (94_981_296, "A", "C", "rs1057910"),
-    ],
-}
+# The 30x VCF has no rsIDs (IDs read "10:94781859:G:A"); the defining
+# sites are labelled by GRCh38 position and allele from the caller's own
+# table, the same one load_variants uses for unannotated VCFs.
+GRCH38_DEFINING_SITES = caller.DEFINING_SITES_GRCH38
 GRCH38_CHROMS = {"DPYD": "1", "TPMT": "6", "UGT1A1": "2", "CYP2C19": "10", "CYP2C9": "10"}
 
 
@@ -267,17 +236,6 @@ def call_diplotype_from_1000genomes(gene: str, sample: str) -> tuple[caller.Dipl
     return call, len(variants)
 
 
-def _site_rsid(gene: str, pos: int, ref: str, alt: str) -> str | None:
-    for site_pos, site_ref, site_alt, rsid in GRCH38_DEFINING_SITES.get(gene, []):
-        if pos != site_pos:
-            continue
-        if site_ref is None and len(ref) != len(alt):
-            return rsid
-        if (ref, alt) == (site_ref, site_alt):
-            return rsid
-    return None
-
-
 def fetch_30x_sites(gene: str, samples: list[str]) -> str:
     """Fetch a gene's defining sites for many samples from the 30x panel in
     one remote call; the per-sample calls are then made locally."""
@@ -319,7 +277,7 @@ def _variants_from_vcf(gene: str, path: Path, label_sites: bool = False) -> list
     variants = []
     for rec in cyvcf2.VCF(str(path)):
         if label_sites:
-            rsid = _site_rsid(gene, rec.POS, rec.REF, rec.ALT[0]) if len(rec.ALT) == 1 else None
+            rsid = caller.site_rsid(gene, rec.POS, rec.REF, rec.ALT[0]) if len(rec.ALT) == 1 else None
         else:
             rsid = rec.ID
         if rsid is None:

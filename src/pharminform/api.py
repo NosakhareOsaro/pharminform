@@ -34,6 +34,7 @@ async def create_report(
     vcf: Annotated[UploadFile, File()],
     min_depth: int = Query(20, ge=1),
     patient_id: str | None = Query(None),
+    sample: str | None = Query(None, description="Sample column; required for multi-sample VCFs"),
 ) -> JSONResponse:
     if not vcf.filename or not vcf.filename.endswith((".vcf", ".vcf.gz")):
         raise HTTPException(status_code=400, detail="Expected a .vcf or .vcf.gz file")
@@ -45,7 +46,7 @@ async def create_report(
             tmp.write(await vcf.read())
             tmp_path = tmp.name
 
-        context = run_pipeline(tmp_path, min_depth=min_depth, patient_id=patient_id)
+        context = run_pipeline(tmp_path, min_depth=min_depth, patient_id=patient_id, sample=sample)
     except Exception as exc:  # surfaced as a 422 rather than a bare 500 traceback
         raise HTTPException(status_code=422, detail=f"Could not process VCF: {exc}") from exc
     finally:
@@ -60,6 +61,7 @@ async def create_report_html(
     vcf: Annotated[UploadFile, File()],
     min_depth: int = Query(20, ge=1),
     patient_id: str | None = Query(None),
+    sample: str | None = Query(None, description="Sample column; required for multi-sample VCFs"),
 ) -> HTMLResponse:
     if not vcf.filename or not vcf.filename.endswith((".vcf", ".vcf.gz")):
         raise HTTPException(status_code=400, detail="Expected a .vcf or .vcf.gz file")
@@ -71,7 +73,7 @@ async def create_report_html(
             tmp.write(await vcf.read())
             tmp_path = tmp.name
 
-        context = run_pipeline(tmp_path, min_depth=min_depth, patient_id=patient_id)
+        context = run_pipeline(tmp_path, min_depth=min_depth, patient_id=patient_id, sample=sample)
     except Exception as exc:
         raise HTTPException(status_code=422, detail=f"Could not process VCF: {exc}") from exc
     finally:

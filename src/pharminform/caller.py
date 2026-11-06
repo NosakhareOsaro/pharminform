@@ -147,6 +147,96 @@ BOOTSTRAP_ALLELE_DEFINITIONS: dict[str, dict[str, dict]] = {
 }
 
 
+# GRCh38 positions of the defining sites, as (position, REF, ALT, rsID),
+# checked against Ensembl GRCh38 and against the 1000 Genomes 30x VCF
+# records. Used to recognise a defining variant in a VCF that carries no
+# rsIDs (common for clinical pipelines that skip dbSNP annotation), and to
+# report defining sites the VCF has no record for. REF/ALT of None matches
+# any indel at that position: the UGT1A1 TA repeat (*28, *36 and *37 are
+# told apart by length in call_diplotype_from_vcf).
+DEFINING_SITES_GRCH38: dict[str, list[tuple[int, str | None, str | None, str]]] = {
+    "DPYD": [
+        (97_450_058, "C", "T", "rs3918290"),
+        (97_515_787, "A", "C", "rs55886062"),
+        (97_082_391, "T", "A", "rs67376798"),
+        (97_573_863, "C", "T", "rs56038477"),
+        (97_579_893, "G", "C", "rs75017182"),
+    ],
+    "TPMT": [
+        (18_143_724, "C", "G", "rs1800462"),
+        (18_138_997, "C", "T", "rs1800460"),
+        (18_130_687, "T", "C", "rs1142345"),
+    ],
+    "UGT1A1": [
+        (233_760_498, "G", "A", "rs4148323"),
+        (233_760_233, None, None, "rs3064744"),
+        (233_759_924, "C", "T", "rs887829"),
+    ],
+    "CYP2C19": [
+        (94_781_859, "G", "A", "rs4244285"),
+        (94_780_653, "G", "A", "rs4986893"),
+        (94_761_900, "C", "T", "rs12248560"),
+    ],
+    "CYP2C9": [
+        (94_942_290, "C", "T", "rs1799853"),
+        (94_981_296, "A", "C", "rs1057910"),
+    ],
+}
+
+# Contig lengths that identify the reference build from a VCF header.
+_CONTIG_LENGTHS = {
+    "GRCh38": {"1": 248_956_422, "2": 242_193_529, "6": 170_805_979, "10": 133_797_422},
+    "GRCh37": {"1": 249_250_621, "2": 243_199_373, "6": 171_115_067, "10": 135_534_747},
+}
+_GRCH37_NAMES = ("grch37", "hg19", "b37", "hs37d5", "human_g1k_v37")
+_GRCH38_NAMES = ("grch38", "hg38", "hs38")
+
+
+def site_rsid(gene: str, pos: int, ref: str, alt: str | None) -> str | None:
+    """rsID of the defining site at this GRCh38 position and allele, if any.
+    ``alt`` of None matches on position only (for a no-call record)."""
+    for site_pos, site_ref, site_alt, rsid in DEFINING_SITES_GRCH38.get(gene, []):
+        if pos != site_pos:
+            continue
+        if alt is None:
+            return rsid
+        if site_ref is None and len(ref) != len(alt):
+            return rsid
+        if (ref, alt) == (site_ref, site_alt):
+            return rsid
+    return None
+
+
+def known_rsids(gene: str) -> set[str]:
+    return {
+        rsid
+        for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(gene, {}).values()
+        for rsid in [info.get("rsid"), *info.get("alias_rsids", []), *info.get("proxy_rsids", [])]
+        if rsid
+    }
+
+
+def detect_reference_build(vcf) -> str | None:
+    """"GRCh38", "GRCh37", or None when the header does not say. Reads
+    contig lengths first, then a ##reference/##assembly line."""
+    try:
+        lengths = dict(zip(vcf.seqnames, vcf.seqlens, strict=False))
+    except (AttributeError, ValueError):
+        lengths = {}
+    lengths = {name.removeprefix("chr"): n for name, n in lengths.items()}
+    for build, expected in _CONTIG_LENGTHS.items():
+        if any(lengths.get(c) == n for c, n in expected.items()):
+            return build
+    header = vcf.raw_header.lower()
+    for line in header.splitlines():
+        if line.startswith(("##reference", "##assembly")):
+            if any(n in line for n in _GRCH38_NAMES):
+                return "GRCh38"
+            if any(n in line for n in _GRCH37_NAMES):
+                return "GRCh37"
+    return None
+
+
 class VCFIngestError(RuntimeError):
     """Raised when the input VCF cannot be parsed or has no usable records."""
 
@@ -189,6 +279,8 @@ def load_variants(
     min_depth: int = 10,
     require_pass: bool = True,
     dropped: dict[str, list[VariantCall]] | None = None,
+    sample: str | None = None,
+    site_status: dict[str, dict[str, str]] | None = None,
 ) -> dict[str, list[VariantCall]]:
     """Parse a VCF with cyvcf2, apply quality filters, and return variant
     calls grouped by target gene.
@@ -201,6 +293,16 @@ def load_variants(
     If ``dropped`` is given, alt-carrying records excluded by those filters
     are collected there per gene, so a defining variant lost to low depth
     can be reported instead of silently becoming a *1/*1 call.
+
+    ``sample`` picks the sample column; it is required when the VCF has
+    more than one, rather than silently using the first. If
+    ``site_status`` is given, each defining site the VCF has a record for
+    is recorded per gene as "called" or "no-call" (genotype missing), so
+    confidence.py can report sites that were absent or not genotyped.
+
+    Raises VCFIngestError for a GRCh37 VCF (the regions and site table are
+    GRCh38, so every gene would silently read as *1/*1), a VCF with no
+    sample columns, or an unknown or ambiguous sample.
     """
     genes = genes or TARGET_GENES
     path = Path(vcf_path)
@@ -212,9 +314,19 @@ def load_variants(
     except Exception as exc:  # pragma: no cover - cyvcf2 raises various C-level errors
         raise VCFIngestError(f"Could not parse VCF {path}: {exc}") from exc
 
+    if detect_reference_build(vcf) == "GRCh37":
+        raise VCFIngestError(
+            f"{path} is on GRCh37 (from its header). PharmInform's gene regions and "
+            "defining sites are GRCh38, so every gene would read as normal; lift the "
+            "VCF over to GRCh38 (e.g. bcftools +liftover or Picard LiftoverVcf) first."
+        )
+    sample_index = _sample_index(vcf.samples, sample, path)
+
     results: dict[str, list[VariantCall]] = {gene: [] for gene in genes}
 
     for gene in genes:
+        known = known_rsids(gene)
+        status = site_status.setdefault(gene, {}) if site_status is not None else None
         region = GENE_REGIONS_GRCH38.get(gene)
         if region is None:
             continue
@@ -228,7 +340,15 @@ def load_variants(
 
         for rec in records:
             depth = _extract_depth(rec)
-            gt_str = _genotype_string(rec)  # per-sample; assume single-sample VCF
+            gt_str = _genotype_string(rec, sample_index)
+            if status is not None:
+                pos_rsid = site_rsid(gene, rec.POS, rec.REF, None)
+                if pos_rsid and "." in gt_str.replace("|", "/").split("/"):
+                    # A no-call wins over a call from another record at the
+                    # same position (split multi-allelics).
+                    status[pos_rsid] = "no-call"
+                elif pos_rsid:
+                    status.setdefault(pos_rsid, "called")
             if not _has_alt_allele(gt_str):
                 continue
             excluded = (require_pass and rec.FILTER not in (None, "PASS", ".")) or (
@@ -242,6 +362,12 @@ def load_variants(
                 # actually carries (e.g. GT 0/2 carries ALT 2, not ALT 1).
                 if not _alt_copies(gt_str, alt_index):
                     continue
+                # Match by rsID when the VCF has a known one; otherwise by
+                # GRCh38 position and allele, so an unannotated VCF still
+                # finds the defining variants.
+                rsid = rec.ID
+                if not (rsid and any(r in known for r in _split_rsids(rsid))):
+                    rsid = site_rsid(gene, rec.POS, rec.REF, alt) or rsid
                 target.append(
                     VariantCall(
                         gene=gene,
@@ -253,11 +379,24 @@ def load_variants(
                         depth=depth,
                         qual=rec.QUAL,
                         filter=rec.FILTER,
-                        rsid=rec.ID,
+                        rsid=rsid,
                         alt_index=alt_index,
                     )
                 )
     return results
+
+
+def _sample_index(samples: list[str], sample: str | None, path: Path) -> int:
+    if not samples:
+        raise VCFIngestError(f"{path} has no sample columns (a sites-only VCF); genotypes are needed.")
+    if sample is not None:
+        if sample not in samples:
+            raise VCFIngestError(f"Sample {sample!r} is not in {path}; it has: {', '.join(samples[:10])}")
+        return samples.index(sample)
+    if len(samples) > 1:
+        shown = ", ".join(samples[:10]) + (" ..." if len(samples) > 10 else "")
+        raise VCFIngestError(f"{path} has {len(samples)} samples ({shown}); choose one with --sample.")
+    return 0
 
 
 def _fallback_scan(path: Path, region: str) -> list:
@@ -290,10 +429,12 @@ def _extract_depth(rec) -> int | None:
     return None
 
 
-def _genotype_string(rec) -> str:
+def _genotype_string(rec, sample_index: int = 0) -> str:
     try:
-        gt = rec.genotypes[0]
-        alleles = "/".join(str(a) for a in gt[:-1])
+        gt = rec.genotypes[sample_index]
+        # cyvcf2 reports a missing allele as -1; write it as "." so a
+        # no-call reads as one ("./.", "./1") everywhere downstream.
+        alleles = "/".join("." if a < 0 else str(a) for a in gt[:-1])
         phased = "|" if len(gt) > 2 and gt[-1] else "/"
         return alleles.replace("/", phased) if phased == "|" else alleles
     except (IndexError, TypeError):  # no sample columns

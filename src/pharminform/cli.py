@@ -11,6 +11,7 @@ from typing import Annotated
 import typer
 
 from . import __version__
+from .caller import VCFIngestError
 from .pipeline import run_pipeline
 from .report import PDFExportUnavailable, write_report
 
@@ -43,10 +44,18 @@ def make_report(
         str | None,
         typer.Option("--patient-id", help="Optional patient/sample label for the report"),
     ] = None,
+    sample: Annotated[
+        str | None,
+        typer.Option("--sample", help="Sample column to report on (required for multi-sample VCFs)"),
+    ] = None,
 ) -> None:
     """Call star alleles from a VCF and generate a PGx clinical report."""
     typer.echo(f"Loading and calling variants from {vcf} (min depth {min_depth})...")
-    context = run_pipeline(vcf, min_depth=min_depth, patient_id=patient_id)
+    try:
+        context = run_pipeline(vcf, min_depth=min_depth, patient_id=patient_id, sample=sample)
+    except VCFIngestError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=2) from exc
 
     for row in context.gene_results:
         flag = " [LOW CONFIDENCE]" if row.confidence_level == "low" else ""

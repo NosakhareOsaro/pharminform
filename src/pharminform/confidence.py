@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .caller import BOOTSTRAP_ALLELE_DEFINITIONS, DiplotypeCall, VariantCall
+from .caller import DEFINING_SITES_GRCH38, DiplotypeCall, VariantCall, known_rsids
 
 # Genes in this panel with clinically important structural variation
 # (whole-gene deletions/duplications, gene-conversion/hybrid alleles) that
@@ -28,6 +28,11 @@ DEFAULT_MIN_DEPTH = 20
 class ConfidenceResult:
     level: str  # "high" or "low"
     reasons: list[str] = field(default_factory=list)
+    # True when an allele could be present but unseen (a defining site with
+    # no genotype call, or a defining variant dropped for depth/FILTER). The
+    # pipeline then reports the phenotype as indeterminate instead of
+    # letting a missing allele read as normal function.
+    phenotype_blocked: bool = False
 
     @property
     def is_low(self) -> bool:
@@ -39,6 +44,7 @@ def assess_confidence(
     all_gene_variants: list[VariantCall] | None = None,
     min_depth: int = DEFAULT_MIN_DEPTH,
     dropped_variants: list[VariantCall] | None = None,
+    site_status: dict[str, str] | None = None,
 ) -> ConfidenceResult:
     """Assess confidence in a single gene's diplotype call.
 
@@ -47,7 +53,9 @@ def assess_confidence(
     can be detected -- not just the ones that happened to match a known
     allele. ``dropped_variants`` are records ``load_variants`` excluded for
     low depth or a failed FILTER; any at a defining site is reported, since
-    the call cannot see that allele.
+    the call cannot see that allele. ``site_status`` (from load_variants)
+    maps each defining site's rsID to "called" or "no-call"; sites missing
+    from it had no VCF record.
     """
     reasons: list[str] = []
 
@@ -73,16 +81,12 @@ def assess_confidence(
         positions = ", ".join(f"{v.chrom}:{v.pos}" for v in low_depth)
         reasons.append(f"low coverage (<{min_depth}x) at defining position(s): {positions}")
 
-    known_rsids = {
-        rsid
-        for info in BOOTSTRAP_ALLELE_DEFINITIONS.get(call.gene, {}).values()
-        for rsid in [info.get("rsid"), *info.get("alias_rsids", []), *info.get("proxy_rsids", [])]
-        if rsid
-    }
+    known = known_rsids(call.gene)
+    blocked = False
 
     lost = [
         v for v in dropped_variants or []
-        if v.rsid and any(r in known_rsids for r in v.rsid.split(";"))
+        if v.rsid and any(r in known for r in v.rsid.split(";"))
     ]
     if lost:
         positions = ", ".join(
@@ -92,12 +96,29 @@ def assess_confidence(
             f"defining variant(s) present but excluded for low depth (<{min_depth}x) or a failed "
             f"FILTER: {positions} -- the diplotype cannot include this allele; review before use"
         )
+        blocked = True
+
+    if site_status is not None:
+        sites = [rsid for *_, rsid in DEFINING_SITES_GRCH38.get(call.gene, [])]
+        nocall = [r for r in sites if site_status.get(r) == "no-call"]
+        absent = [r for r in sites if r not in site_status]
+        if nocall:
+            reasons.append(
+                f"no genotype call at defining site(s) {', '.join(nocall)} -- the allele "
+                "cannot be ruled out; phenotype reported as indeterminate"
+            )
+            blocked = True
+        if absent:
+            reasons.append(
+                f"no VCF record at {len(absent)} of {len(sites)} defining site(s) ({', '.join(absent)}); "
+                "in a variant-only VCF this usually means reference, but coverage there is not shown"
+            )
 
     if all_gene_variants is not None:
         novel = [
             v for v in all_gene_variants
             if v.rsid not in (None, ".")
-            and not any(r in known_rsids for r in v.rsid.split(";"))
+            and not any(r in known for r in v.rsid.split(";"))
         ]
         unnamed = [v for v in all_gene_variants if v.rsid in (None, ".")]
         if novel:
@@ -111,4 +132,4 @@ def assess_confidence(
             )
 
     level = "low" if reasons else "high"
-    return ConfidenceResult(level=level, reasons=reasons)
+    return ConfidenceResult(level=level, reasons=reasons, phenotype_blocked=blocked)
