@@ -25,7 +25,7 @@ decisions. See [Disclaimer](#disclaimer).
 - [x] Directional ultrarapid-metabolizer flag
 - [x] Composite risk test suite (monotonicity, fallback)
 - [x] Face-validity case-report tests
-- [x] GeT-RM validation on the 1000 Genomes 30x panel -- DPYD 94/94, TPMT 87/87, UGT1A1 59/60 diplotypes (60/60 phenotypes), CYP2C9 81/81, CYP2C19 88/88; phenotype rules checked against CPIC's tables for all 82 callable diplotypes; CYP2D6 not called from VCF (0/6 on phase 3; see below)
+- [x] GeT-RM **validation harness** on the 1000 Genomes 30x panel -- DPYD 94/94, TPMT 87/87, UGT1A1 59/60 diplotypes (60/60 phenotypes), CYP2C9 81/81, CYP2C19 88/88; phenotype rules checked against CPIC's tables for all 82 callable diplotypes; CYP2D6 not called from VCF (0/6 on phase 3; see below). **This is a concordance harness, not a clinical validation:** the GeT-RM cohort is predominantly normal-function samples, and the DPYD comparison is limited to *2A and *13 for the 85 samples whose consensus predates the 2024 DPYD study.
 - [x] Jinja2 HTML clinical report + PDF export
 - [x] CPIC truth-set pytest suite
 - [x] CLI
@@ -184,7 +184,7 @@ small, illustrative, non-exhaustive allele table
 authoritative definitions (`pharmvar_client.py`, which requires an
 account-issued API key) or for running Aldy directly against aligned reads.
 
-## GeT-RM validation
+## GeT-RM validation harness
 
 **DPYD, TPMT, UGT1A1, CYP2C9 and CYP2C19.** Consensus genotypes from the CDC GeT-RM
 consolidated table (V4, 1-22-25) were translated to the calls the
@@ -363,5 +363,5 @@ calling from VCF for CYP2C19, CYP2C9, DPYD, TPMT and UGT1A1 (CYP2D6 via
 Aldy on aligned reads only), CPIC dosing recommendations, an experimental
 multi-gene composite risk score, and a Streamlit demo. It is not yet on
 PyPI or Bioconda (a recipe skeleton is in `conda-recipe/`), and the JOSS
-paper is a draft. GeT-RM concordance results are in the GeT-RM validation
+paper is a draft. GeT-RM concordance results are in the GeT-RM validation harness
 section above.

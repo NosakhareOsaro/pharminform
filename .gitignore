@@ -31,3 +31,7 @@ docs/_build/
 /validation/data/
 
 .claude/
+# R session artefacts
+.Rhistory
+.RData
+.Rproj.user/
