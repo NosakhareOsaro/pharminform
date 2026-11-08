@@ -3,15 +3,17 @@ message: "If you use PharmInform, please cite it using the metadata below."
 title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
 authors:
   - family-names: "Osaro"
-    given-names: "Nosakhare"
-    # No placeholder orcid here: Zenodo's CFF loader (zenodo-rdm's
+    given-names: "Nosakhare Odionfo"
+    email: "osaronosakhare@gmail.com"
+    # A real ORCID now exists and is used here. Background, kept because it
+    # cost a failed archive attempt: Zenodo's CFF loader (zenodo-rdm's
     # AuthorSchema.validate_orcid) runs idutils.is_orcid() on this field,
-    # which checksums it (ISO 7064 MOD 11-2) -- "0000-0000-0000-0000"
-    # fails that checksum and was the confirmed cause of the
-    # "Citation metadata load failed" error on the v0.1.0 archive attempt
-    # (traced directly in zenodo-rdm's source, not inferred). orcid is
-    # optional in this schema, so omitting it entirely is valid; add a
-    # real ORCID back in once one exists.
+    # which checksums it (ISO 7064 MOD 11-2). The placeholder
+    # "0000-0000-0000-0000" fails that checksum and was the confirmed cause
+    # of the "Citation metadata load failed" error on the v0.1.0 archive
+    # attempt (traced directly in zenodo-rdm's source, not inferred).
+    # Never put a placeholder back in this field.
+    orcid: "https://orcid.org/0009-0004-9778-1161"
 version: 0.2.0
 date-released: "2026-11-06"
 license: MIT
@@ -29,9 +31,9 @@ preferred-citation:
   type: article
   title: "PharmInform: A Python Platform for Star Allele Calling, CPIC Dosing Guidance, and Multi-Gene Composite Pharmacogenomic Risk Scoring"
   authors:
-    - family-names: "Your Last Name"
-      given-names: "Your First Name"
-      orcid: "https://orcid.org/0000-0000-0000-0000"
+    - family-names: "Osaro"
+      given-names: "Nosakhare Odionfo"
+      orcid: "https://orcid.org/0009-0004-9778-1161"
   journal: "Journal of Open Source Software"
   # Fill in once accepted -- JOSS assigns its own DOI/volume/issue/page at
   # publication.
