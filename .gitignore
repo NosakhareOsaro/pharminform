@@ -29,5 +29,3 @@ docs/_build/
 *.fastq.gz
 *.vcf.gz.tbi
 /validation/data/
-
-.claude/
