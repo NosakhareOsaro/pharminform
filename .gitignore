@@ -30,7 +30,6 @@ docs/_build/
 *.vcf.gz.tbi
 /validation/data/
 
-.claude/
 # R session artefacts
 .Rhistory
 .RData

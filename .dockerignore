@@ -9,4 +9,3 @@ validation/data/
 *.bam
 *.bai
 *.cram
-.claude/
